@@ -1,0 +1,645 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Gill Sans", "Gill Sans MT", sans-serif;
+  background: white;
+  color: black;
+  overflow-x: hidden;
+}
+
+/* Landing Section */
+#landing {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+#landing h1 {
+  font-size: 8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+/* Individual letter styling for animation */
+.letter {
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.letter.image-mode {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  overflow: hidden;
+  vertical-align: baseline;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.letter.image-mode img {
+  width: 150%;
+  height: 150%;
+  object-fit: cover;
+  vertical-align: baseline;
+  margin: -25% 0 0 -25%;
+}
+
+#landing .subtitle {
+  font-size: 1.65rem;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+#landing .credit {
+  font-size: 1.18rem;
+  opacity: 0.7;
+  margin-bottom: 0;
+}
+
+.scroll-indicator {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0.8;
+}
+
+.scroll-arrow {
+  font-size: 1.5rem;
+  color: #0000FF;
+  opacity: 1;
+  font-weight: 600;
+  border-radius: 50%;
+  padding: 0.2rem;
+  transition: opacity 0.3s ease;
+}
+
+/* Add subtle gradient fade at bottom of landing */
+#landing::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8));
+  pointer-events: none;
+}
+
+/* Intro Section */
+#intro {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background: white;
+}
+
+.intro-text {
+  max-width: 700px;
+  text-align: left;
+}
+
+.intro-text p {
+  font-size: 1.4rem;
+  line-height: 1.8;
+  font-weight: 400;
+  margin-bottom: 2rem;
+  opacity: 0;
+}
+
+.intro-text.visible p {
+  opacity: 1;
+}
+
+.intro-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Scrollytelling */
+#scrollytelling {
+  position: relative;
+  min-height: 150vh;
+}
+
+/* FIXED Chart - stays in place */
+#chart-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  z-index: 1;
+  display: none; /* Hidden by default until user scrolls past intro */
+}
+
+#viz {
+  width: 100%;
+  height: 100%;
+}
+
+/* Scrollable Story - on top of chart */
+#story {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.step {
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 2rem 3rem 2rem;
+}
+
+.text-box {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  padding: 20px 30px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+[data-step="spike-1795"] .text-box {
+  position: fixed;
+  top: auto;
+  left: 3%;
+  bottom: calc(100vh - 250px);
+  transform: none;
+  max-width: 750px;
+  padding: 20px 30px;
+}
+
+.washington-portrait {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  width: 180px;
+  height: auto;
+  max-height: 280px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 11;
+  transition: opacity 0.8s ease;
+  visibility: visible;
+}
+
+.washington-portrait.visible {
+  opacity: 1;
+}
+
+.washington-portrait img {
+  width: 100%;
+  height: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+.text-box.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.8s ease;
+}
+
+.text-box h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.text-box p {
+  font-size: 1.4rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+/* Highlighted text */
+.highlight {
+  background-color: #0000FF; /* Accent blue */
+  color: white; /* White text */
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.2rem;
+}
+
+/* Highlight Gilbert Stuart */
+.gilbert-stuart {
+  background-color: #0000FF; /* Accent blue */
+  color: white; /* White text */
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+/* Filter Section Layout */
+.filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 3rem;
+  max-width: none;
+  width: auto;
+  left: 3%;
+  right: 3%;
+  transform: none;
+  padding: 20px 30px;
+  margin-top: -10px;
+}
+
+.filter-left {
+  flex-shrink: 0;
+  pointer-events: all;
+  margin-right: auto;
+}
+
+.filter-explanations {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 900px;
+  width: 90%;
+  pointer-events: none;
+  z-index: 15;
+  padding-bottom: 0;
+}
+
+.filter-explanation {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.filter-explanation.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.8s ease;
+}
+
+.filter-explanation p {
+  font-size: 1.4rem;
+  line-height: 1.7;
+  color: #0000FF;
+  margin: 0;
+}
+
+/* Explore Button */
+.explore-button {
+  font-size: 1.2rem;
+  padding: 1rem 2.5rem;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.explore-button:hover {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.explore-button:active {
+  transform: translateY(0);
+}
+
+/* Filter Dropdown */
+.filter-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  margin: 0;
+  line-height: 1.2;
+  font-size: 1.47rem;
+}
+
+#d3-dropdown-container {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  overflow: visible;
+  opacity: 0;
+  visibility: hidden;
+}
+
+#d3-dropdown-container.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.filter-container-inline {
+  position: relative;
+  display: inline-block;
+  pointer-events: all;
+}
+
+/* Category Labels */
+.category-label {
+  font-size: 0.9rem;
+  fill: #999;
+  font-weight: 500;
+}
+
+/* Accent blue text */
+.accent-blue {
+  color: #0000FF;
+}
+
+/* Memory Game Section */
+#memory-game-section {
+  min-height: 100vh;
+  background: white;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.memory-intro {
+  max-width: 700px;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.memory-intro h2 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.memory-intro p {
+  font-size: 1.18rem;
+  line-height: 1.7;
+  color: #000;
+}
+
+.memory-game-container {
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+}
+
+.game-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+#buttons {
+  display: flex;
+  gap: 10px;
+}
+
+#hint, #playAgain {
+  padding: 10px 20px;
+  background: #0000FF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: "Gill Sans", "Gill Sans MT", sans-serif;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+#hint:hover, #playAgain:hover {
+  background: #0000CC;
+}
+
+#hint:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+#stats {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  gap: 15px;
+}
+
+#hintMessage {
+  margin: 10px 0 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0000FF;
+  display: none;
+  padding: 15px 20px;
+  background: rgba(0, 0, 255, 0.05);
+  border-radius: 8px;
+  border-left: 4px solid #0000FF;
+}
+
+#message {
+  margin: 10px 0 20px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: green;
+  display: none;
+  padding: 15px 20px;
+  background: rgba(0, 255, 0, 0.05);
+  border-radius: 8px;
+  text-align: center;
+}
+
+#loading {
+  margin: 20px 0;
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 15px;
+  padding: 0;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  width: 100%;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 3px solid #ddd;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.card.selected {
+  border-color: #0000FF;
+  box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.2);
+}
+
+.card.correct {
+  border-color: green;
+  box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.2);
+}
+
+.card.incorrect {
+  border-color: red;
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+}
+
+.card.blurred {
+  opacity: 0.3;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.card .front {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  justify-content: flex-end;
+}
+
+.card .title {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 8px;
+  font-size: 13px;
+  text-align: center;
+  font-family: "Gill Sans", "Gill Sans MT", sans-serif;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  #landing h1 {
+    font-size: 6rem;
+  }
+  
+  .letter.image-mode {
+    width: 0.75em;
+    height: 0.75em;
+  }
+  
+  #intro {
+    padding: 2rem 1rem;
+    min-height: 70vh;
+  }
+  
+  .intro-text {
+    max-width: 100%;
+  }
+  
+  .intro-text p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  #landing .subtitle {
+    font-size: 1.3rem;
+  }
+  
+  #landing .credit {
+    font-size: 0.95rem;
+  }
+  
+  .text-box p {
+    font-size: 1.1rem;
+  }
+  
+  .filter-explanation p {
+    font-size: 1.1rem;
+  }
+  
+  .filter-prompt {
+    font-size: 1.1rem;
+  }
+  
+  #memory-game-section {
+    padding: 2rem 1rem;
+  }
+  
+  .memory-intro h2 {
+    font-size: 2rem;
+  }
+  
+  .memory-intro p {
+    font-size: 1rem;
+  }
+  
+  #app {
+    gap: 10px;
+  }
+  
+  .card .title {
+    font-size: 11px;
+    padding: 6px;
+  }
+  
+  .game-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+

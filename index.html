@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remember Me: American Portraits</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <!-- Landing Page -->
+  <section id="landing">
+    <h1 id="animated-title">Remember Me?</h1>
+    <p class="subtitle accent-blue">Get up close and personal with the faces of the American Revolution.</p>
+    <p class="credit">Powered by data from the Smithsonian National Portrait Gallery.</p>
+    <div class="scroll-indicator">
+      <span class="scroll-arrow">↓</span>
+    </div>
+  </section>
+  
+  <!-- Intro Text -->
+  <section id="intro">
+    <div class="intro-text">
+      <p>Shakespeare said you can't read a mind from a face. Plato thought you could. Billy Joel sang we all wear masks. The truth sits somewhere between. We project meaning onto faces because we want them to tell us something real. Sometimes they do. Usually, they just show who's been given the chance to be seen.</p>
+      
+      <p>In early America, portraits were that chance. They weren't about likeness; they were about visibility. <span class="highlight">To be painted was to exist in history.</span> It meant wealth, proximity, and an artist who decided your face was worth keeping. The National Portrait Gallery's collection makes those choices visible. It's less a record of a nation's people than of who it chose to remember.</p>
+      
+      <p>This project treats those portraits as data. Each dot marks a portrait made during or soon after the Revolution. Dates were standardized for consistency. Together, they chart fluctuations in portrait production of a young nation trying to find its face.</p>
+    </div>
+  </section>
+  
+  <!-- Main Scrollytelling Area -->
+  <div id="scrollytelling">
+    
+    <!-- Fixed Chart -->
+    <div id="chart-fixed">
+      <svg id="viz"></svg>
+      <div class="washington-portrait" id="washington-portrait">
+        <img src="https://ids.si.edu/ids/deliveryService?id=NPG-NPG_2001_13_ext" alt="George Washington portrait by Gilbert Stuart">
+      </div>
+    </div>
+    
+    <!-- Scrollable Story -->
+    <div id="story">
+      
+      <section class="step" data-step="timeline">
+        <!-- Empty - just show chart loading -->
+      </section>
+      
+      <section class="step" data-step="spike-1795">
+        <div class="text-box">
+          <p>1795 was the year America sat for its portrait. Painter <span class="gilbert-stuart">Gilbert Stuart</span> showed up in Philly and suddenly every Revolutionary hero wanted their face on a canvas. His George Washington portrait became the reference image, getting practically Xeroxed across the new republic.</p>
+        </div>
+      </section>
+      
+      <section class="step" data-step="filter">
+        <div class="text-box filter-section">
+          <div class="filter-left">
+            <p class="filter-prompt">
+              Sort the collection by <span id="d3-dropdown-container"></span>
+            </p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="step" data-step="explanations">
+        <div class="filter-explanations">
+          <div class="filter-explanation" data-category="size">
+            <p>In early America, size was status. Miniatures lived in pockets and lockets, meant to be held, not seen. Full-size portraits hung in parlors and state rooms, built for public memory.</p>
+          </div>
+          
+          <div class="filter-explanation" data-category="artist">
+            <p>As Jay-Z put it, "I'm not a businessman, I'm a business, man." The known artists stamped themselves into history, preserving their face and signature. The unknown ones didn't get as lucky.</p>
+          </div>
+          
+          <div class="filter-explanation" data-category="sitter">
+            <p>Some names were recorded because they mattered. When the sitter is unnamed, it says just as much: someone paid for the portrait, but not enough value was placed on the person's name to preserve it.</p>
+          </div>
+          
+          <div class="filter-explanation" data-category="gender">
+            <p>The ratio skews male. That tells you less about population and more about who portrait culture considered worth recording. Unless you were the wife of a man who mattered, of course.</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="step" data-step="end">
+        <!-- Empty spacer -->
+      </section>
+      
+    </div>
+  </div>
+  
+  <!-- Memory Game Section -->
+  <section id="memory-game-section">
+    <div class="memory-intro">
+      <h2>Test Your Memory</h2>
+      <p>Among these 16 portraits, 4 are self-portraits—artists who painted themselves into history. Can you identify all 4?</p>
+    </div>
+    
+    <div class="memory-game-container">
+      <header class="game-header">
+        <div id="stats">
+          <span>Strikes: <span id="strikes">0</span>/5</span>
+        </div>
+        <div id="buttons">
+          <button id="hint">Hint</button>
+          <button id="playAgain">Play Again</button>
+        </div>
+      </header>
+      <div id="hintMessage"></div>
+      <div id="message"></div>
+      <div id="loading">Loading game...</div>
+      <div id="app"></div>
+    </div>
+  </section>
+  
+  <!-- Use modular JS structure -->
+  <script type="module" src="js/main.js"></script>
+  <script src="js/memory.js"></script>
+</body>
+</html>

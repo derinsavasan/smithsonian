@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: "Gill Sans", "Gill Sans MT", sans-serif;
+  font-family: 'Cabin', Arial, sans-serif;
   background: white;
   color: black;
   overflow-x: hidden;
@@ -24,6 +24,7 @@ body {
 }
 
 #landing h1 {
+  font-family: 'Boldonse', Arial, sans-serif;
   font-size: 8rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -38,9 +39,6 @@ body {
 }
 
 .letter.image-mode {
-  display: inline-block;
-  width: 0.95em;
-  height: 0.95em;
   overflow: hidden;
   vertical-align: baseline;
   position: relative;
@@ -48,11 +46,10 @@ body {
 }
 
 .letter.image-mode img {
-  width: 150%;
-  height: 150%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  vertical-align: baseline;
-  margin: -25% 0 0 -25%;
+  display: block;
 }
 
 #landing .subtitle {
@@ -84,6 +81,13 @@ body {
   border-radius: 50%;
   padding: 0.2rem;
   transition: opacity 0.3s ease;
+  animation: scrollPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(6px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.7; }
 }
 
 /* Add subtle gradient fade at bottom of landing */
@@ -100,24 +104,26 @@ body {
 
 /* Intro Section */
 #intro {
-  min-height: 80vh;
+  min-height: 60vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
+  padding: 2rem 2rem;
   background: white;
 }
 
 .intro-text {
-  max-width: 700px;
-  text-align: left;
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: 'Cabin', Arial, sans-serif;
 }
 
 .intro-text p {
-  font-size: 1.4rem;
-  line-height: 1.8;
+  font-size: 1.3rem;
+  line-height: 1.7;
   font-weight: 400;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   opacity: 0;
 }
 
@@ -224,13 +230,13 @@ body {
 }
 
 .text-box h2 {
-  font-size: 2.2rem;
+  font-size: 2.1rem;
   margin-bottom: 1rem;
   color: #000;
 }
 
 .text-box p {
-  font-size: 1.4rem;
+  font-size: 1.32rem;
   line-height: 1.7;
   margin-bottom: 1rem;
   color: #000;
@@ -307,7 +313,7 @@ body {
 }
 
 .filter-explanation p {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   line-height: 1.7;
   color: #0000FF;
   margin: 0;
@@ -345,7 +351,7 @@ body {
   flex-wrap: nowrap;
   margin: 0;
   line-height: 1.2;
-  font-size: 1.47rem;
+  font-size: 1.38rem;
 }
 
 #d3-dropdown-container {
@@ -370,7 +376,7 @@ body {
 
 /* Category Labels */
 .category-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   fill: #999;
   font-weight: 500;
 }
@@ -445,7 +451,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  font-family: "Gill Sans", "Gill Sans MT", sans-serif;
+  font-family: 'Cabin', Arial, sans-serif;
   font-weight: 600;
   transition: background 0.2s;
 }
@@ -577,11 +583,6 @@ body {
     font-size: 6rem;
   }
   
-  .letter.image-mode {
-    width: 0.75em;
-    height: 0.75em;
-  }
-  
   #intro {
     padding: 2rem 1rem;
     min-height: 70vh;
@@ -642,4 +643,3 @@ body {
     gap: 10px;
   }
 }
-

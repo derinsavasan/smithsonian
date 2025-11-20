@@ -75,7 +75,7 @@ export function createDropdown() {
     .attr("y", 28)
     .attr("text-anchor", "middle")
     .attr("fill", "#fff")
-    .attr("font-size", "24px")
+    .attr("font-size", "22px")
     .attr("font-weight", "600")
     .style("pointer-events", "none")
     .text("this dropdown");
@@ -86,7 +86,7 @@ export function createDropdown() {
     .attr("y", 28)
     .attr("text-anchor", "middle")
     .attr("fill", "#fff")
-    .attr("font-size", "19px")
+    .attr("font-size", "18px")
     .attr("font-weight", "600")
     .style("pointer-events", "none")
     .text("↓");
@@ -140,7 +140,7 @@ export function createDropdown() {
     .attr("x", 20)
     .attr("y", 26)
     .attr("fill", "#333")
-    .attr("font-size", "21px")
+    .attr("font-size", "20px")
     .attr("font-weight", "500")
     .style("pointer-events", "none")
     .text(d => d.label);

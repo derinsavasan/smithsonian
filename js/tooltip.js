@@ -12,8 +12,8 @@ export function createTooltip() {
     .style("background", "rgba(0, 0, 0, 0.9)")
     .style("color", "#fff")
     .style("border-radius", "8px")
-    .style("font-size", "14px")
-    .style("font-family", "Gill Sans, Gill Sans MT, sans-serif")
+    .style("font-size", "1.2rem")
+    .style("font-family", "'Cabin', Arial, sans-serif")
     .style("pointer-events", "none")
     .style("opacity", 0)
     .style("z-index", 1000)
@@ -66,10 +66,10 @@ function buildTooltipContent(d) {
   
   let content = '<div style="flex: 1; min-width: 0;">';
   content += `
-    <strong style="display: block; margin-bottom: 4px; font-size: 16px; line-height: 1.3;">${d.title || "Untitled"}</strong>
-    <em style="display: block; margin-bottom: 2px; font-size: 14px; line-height: 1.3; font-style: italic;">${d.artist || "Unknown Artist"}</em>
-    <span style="display: block; margin-bottom: 2px; font-size: 14px; line-height: 1.3;">${d.sitter || "Unknown Sitter"}</span>
-    <span style="display: block; font-size: 13px; line-height: 1.3; color: #ccc;">Year: ${d.year}</span>
+    <strong style="display: block; margin-bottom: 4px; font-size: 1.38rem; line-height: 1.3;">${d.title || "Untitled"}</strong>
+    <em style="display: block; margin-bottom: 2px; font-size: 1.2rem; line-height: 1.3; font-style: italic;">${d.artist || "Unknown Artist"}</em>
+    <span style="display: block; margin-bottom: 2px; font-size: 1.15rem; line-height: 1.3;">${d.sitter || "Unknown Sitter"}</span>
+    <span style="display: block; font-size: 1rem; line-height: 1.3; color: rgba(255, 255, 255, 0.75);">Year: ${d.year}</span>
   `;
   content += '</div>';
   

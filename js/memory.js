@@ -4,21 +4,28 @@ let selected = [];
 let strikes = 0;
 let gameOver = false;
 let hintIndex = 0;
+const categoryHint = "Sometimes the easiest model to paint is the one who’s always available.";
 const hints = [
-  "Self-portraits are paintings where the artist depicts themselves as the subject.",
-  "Look for portraits where the person is looking directly at the viewer - artists often gaze confidently in self-portraits.",
-  "Self-portraits may include artistic tools like brushes or palettes in the scene.",
-  "Artists in self-portraits sometimes wear simple clothing or work attire."
+  "When the gaze feels deliberate, almost confrontational, it usually means the painter is looking straight into a mirror.",
+  "Look for sitters dressed more plainly than usual. Artists often painted themselves in simple clothes.",
+  "Check for faces lit from one side. The light often comes from a studio window or mirror setup.",
+  "Not all of these were studio scenes. One sits out in the open."
 ];
 
-// Load data and initialize game
+const startButton = d3.select('#startGame');
+const playAgainButton = d3.select('#playAgain');
+const overlay = d3.select('#game-overlay');
+const gameShell = d3.select('#game-shell');
+const statsContainer = d3.select('#stats');
+const hintContainer = d3.select('#hintMessage');
+
+// Load data and prime the UI
 d3.csv("data/portraits_v1.csv").then(loadedData => {
   data = loadedData;
-  renderGrid();
-  // Show initial hint
-  d3.select('#hintMessage').text('Hint: ' + hints[0]).style('display', 'block');
-  hintIndex = 1; // Next hint available
   d3.select('#loading').style('display', 'none');
+  startButton.attr('disabled', null);
+}).catch(() => {
+  d3.select('#loading').text('Unable to load portraits right now.');
 });
 
 // Render the 4x4 grid
@@ -47,10 +54,9 @@ function renderGrid() {
 
   cards.append("div")
     .attr("class", "front")
-    .style("background-image", d => `url(${d.thumbnail})`)
-    .append("div")
-    .attr("class", "title")
-    .text(d => d.title);
+    .style("background-image", d => `url(${d.thumbnail})`);
+  
+  revealCardsSequentially(cards);
 }
 
 // Handle card selection
@@ -90,83 +96,158 @@ function checkMatch() {
     // Incorrect
     strikes++;
     d3.select('#strikes').text(strikes);
-    if (strikes === 1) {
-      // First wrong - just deselect
-      selected.forEach(card => {
-        d3.select(card).classed('selected', false);
-      });
-      selected = [];
-    } else {
-      // Strikes 2+ - blur 2 of the selected incorrect cards and show hint if available
-      const toBlur = selected.sort(() => 0.5 - Math.random()).slice(0, 2);
-      toBlur.forEach(card => {
-        d3.select(card).classed('blurred', true);
-      });
-      // Show next hint if available
-      if (hintIndex < hints.length) {
-        d3.select('#hintMessage').text('Hint: ' + hints[hintIndex]).style('display', 'block');
-        hintIndex++;
-        if (hintIndex >= hints.length) {
-          d3.select('#hint').property('disabled', true);
-        }
-      }
-      selected = []; // Deselect all
+    // Eliminate incorrect cards that were selected
+    const incorrectSelected = selected.filter(card => d3.select(card).attr('data-is-self') !== 'TRUE');
+    const toBlur = d3.shuffle(incorrectSelected).slice(0, 2);
+    toBlur.forEach(card => {
+      d3.select(card).classed('blurred', true);
+    });
+    // Show next hint if available
+    if (hintIndex < hints.length) {
+      hintContainer.text(hints[hintIndex]).style('display', 'block');
+      hintIndex++;
     }
+    // Deselect all remaining selected cards
+    selected.forEach(card => {
+      d3.select(card).classed('selected', false);
+    });
+    selected = []; // Clear the array
     if (strikes >= 5) {
-      d3.select('#message').text('Game Over! Too many strikes.').style('display', 'block').style('color', 'red');
+      // Final reveal: visually mark the correct self-portraits on the board
+      const correctCards = d3.selectAll('.card').filter(function() {
+        return d3.select(this).attr('data-is-self') === 'TRUE';
+      });
+      correctCards.each(function() {
+        d3.select(this).classed('correct', true).classed('blurred', false);
+      });
+      // Also ensure other cards are blurred to emphasize correct answers
+      d3.selectAll('.card').filter(function() {
+        return d3.select(this).attr('data-is-self') !== 'TRUE';
+      }).classed('blurred', true);
+
+      const revealText = 'Final Reveal<br>Correct 4 portraits<br>Explanation of the connection: These are self-portraits where the artist painted themselves.<br>Additional context for non-connected portraits: These are portraits of other individuals, not the artists themselves.';
+      d3.select('#message').html(revealText).style('display', 'block').style('color', 'red');
       gameOver = true;
+      showReplayOverlay();
     }
   }
 }
 
 // Victory reveal animation
 function victoryReveal() {
-  const nonSelfCards = d3.selectAll('.card').filter(function() {
-    return d3.select(this).attr('data-is-self') !== 'TRUE';
+  const allCards = d3.selectAll('.card');
+  const nonSelfCards = allCards
+    .filter(function() {
+      return d3.select(this).attr('data-is-self') !== 'TRUE';
+    })
+    .nodes();
+  
+  const shuffledCards = d3.shuffle(nonSelfCards.slice());
+  
+  // Stagger blurring with a steady cadence
+  const cadence = 200;
+  shuffledCards.forEach((card, idx) => {
+    setTimeout(() => {
+      d3.select(card).classed('blurred', true);
+    }, cadence * idx);
   });
-  let index = 0;
-  const interval = setInterval(() => {
-    for (let i = 0; i < 2 && index < nonSelfCards.size(); i++) {
-      d3.select(nonSelfCards.nodes()[index]).classed('blurred', true);
-      index++;
-    }
-    if (index >= nonSelfCards.size()) {
-      clearInterval(interval);
-      // Mark correct cards
-      selected.forEach(card => {
-        d3.select(card).classed('correct', true).classed('selected', false);
-      });
-      d3.select('#message').text('Correct!').style('display', 'block').style('color', 'green');
-      gameOver = true;
-    }
-  }, 300);
+  
+  const totalRevealTime = 150 * shuffledCards.length + 600;
+  setTimeout(() => {
+    // Mark correct cards
+    selected.forEach(card => {
+      d3.select(card).classed('correct', true).classed('selected', false);
+    });
+    d3.select('#message').text('You’ve Won!').style('display', 'block').style('color', 'green');
+    gameOver = true;
+    showReplayOverlay();
+    triggerConfetti();
+  }, totalRevealTime);
+}
+
+function revealCardsSequentially(cardsSelection) {
+  const nodes = d3.shuffle(cardsSelection.nodes().slice());
+  cardsSelection.classed('card-hidden', true);
+  nodes.forEach((node, idx) => {
+    const delay = 70 * idx;
+    setTimeout(() => {
+      d3.select(node).classed('card-hidden', false);
+    }, delay);
+  });
 }
 
 // Reset game
 function resetGame() {
+  playAgainButton.attr('disabled', true).style('display', 'none');
   strikes = 0;
   selected = [];
   gameOver = false;
   hintIndex = 0;
   d3.select('#strikes').text(0);
   d3.select('#message').style('display', 'none');
-  d3.select('#hintMessage').text('Hint: ' + hints[0]).style('display', 'block');
-  hintIndex = 1;
-  d3.select('#hint').property('disabled', false);
+  hintContainer.text(categoryHint).style('display', 'block');
   d3.selectAll('.card').classed('blurred', false).classed('correct', false).classed('selected', false).classed('incorrect', false);
   renderGrid();
 }
 
 // Event listener for play again
-d3.select('#playAgain').on('click', resetGame);
+playAgainButton.on('click', resetGame);
 
-// Event listener for hint
-d3.select('#hint').on('click', function() {
-  if (hintIndex < hints.length) {
-    d3.select('#hintMessage').text('Hint: ' + hints[hintIndex]).style('display', 'block');
-    hintIndex++;
-    if (hintIndex >= hints.length) {
-      d3.select('#hint').property('disabled', true);
-    }
+function startGame() {
+  if (!data.length) {
+    return;
   }
-});
+  startButton.classed('visible', false).attr('disabled', true);
+  overlay.classed('hidden', true);
+  gameShell.classed('game-active', true);
+  statsContainer.classed('hidden', false);
+  hintContainer.classed('hidden', false);
+  resetGame();
+}
+
+function showReplayOverlay() {
+  playAgainButton.attr('disabled', null).style('display', 'inline-flex');
+  hintContainer.style('display', 'none');
+}
+
+function triggerConfetti() {
+  if (typeof confetti !== "function") return;
+  
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.7 }
+  };
+  
+  function fire(particleRatio, opts) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio)
+    });
+  }
+  
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  });
+  fire(0.2, {
+    spread: 60,
+  });
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  });
+}
+
+startButton.on('click', startGame);

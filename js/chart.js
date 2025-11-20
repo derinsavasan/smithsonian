@@ -47,7 +47,7 @@ export function drawVisualization(width, height, allPortraits) {
   
   xAxis.selectAll("text")
      .style("font-size", "21px")
-    .style("font-family", "Gill Sans, Gill Sans MT, sans-serif");
+    .style("font-family", "Cabin, Arial, sans-serif");
   
   // Create tooltip
   createTooltip();

@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Remember Me: American Portraits</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- Cabin font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Boldonse font -->
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-memory.css">
 </head>
 <body>
   
@@ -91,31 +96,40 @@
     </div>
   </div>
   
+  <!-- Post-chart explanatory text -->
+  <section id="post-chart-text">
+    <div class="intro-text visible">
+      <p class="intro-p">You’ve seen the trends. Now try spotting them yourself. First, guess the category. Then pick the portraits that fit. If you get stuck, the hints will nudge you.</p>
+    </div>
+  </section>
+  
   <!-- Memory Game Section -->
   <section id="memory-game-section">
-    <div class="memory-intro">
-      <h2>Test Your Memory</h2>
-      <p>Among these 16 portraits, 4 are self-portraits—artists who painted themselves into history. Can you identify all 4?</p>
-    </div>
-    
     <div class="memory-game-container">
-      <header class="game-header">
-        <div id="stats">
+      <div id="game-shell">
+        <div id="game-board">
+          <div id="app"></div>
+          <div id="game-overlay" class="game-overlay">
+            <div class="overlay-controls">
+              <button id="startGame" class="game-button visible" disabled>Start the Game</button>
+            </div>
+            <div id="loading">Loading game...</div>
+          </div>
+        </div>
+      </div>
+      <aside class="game-sidebar">
+        <div id="stats" class="hidden">
           <span>Strikes: <span id="strikes">0</span>/5</span>
         </div>
-        <div id="buttons">
-          <button id="hint">Hint</button>
-          <button id="playAgain">Play Again</button>
-        </div>
-      </header>
-      <div id="hintMessage"></div>
-      <div id="message"></div>
-      <div id="loading">Loading game...</div>
-      <div id="app"></div>
+        <div id="message"></div>
+        <div id="hintMessage" class="hidden"></div>
+        <button id="playAgain" disabled>Play Again</button>
+      </aside>
     </div>
   </section>
   
   <!-- Use modular JS structure -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="js/main.js"></script>
   <script src="js/memory.js"></script>
 </body>

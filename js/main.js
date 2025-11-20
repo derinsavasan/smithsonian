@@ -71,56 +71,69 @@ function setupTitleAnimation(data) {
   
   const letters = title.querySelectorAll('.letter');
   
-  // Start animation after a delay
-  setTimeout(() => {
-    startLetterSwapping(letters, thumbnails);
-  }, 2000);
+  const beginSwapping = () => {
+    const measureAndStart = () => {
+      lockLetterWidths(letters);
+      setTimeout(() => {
+        startLetterSwapping(letters, thumbnails);
+      }, 2000);
+    };
+    
+    // Wait a frame to ensure layout (and fonts) are ready before measuring
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(measureAndStart);
+    } else {
+      measureAndStart();
+    }
+  };
+  
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(beginSwapping);
+  } else {
+    beginSwapping();
+  }
 }
 
 function startLetterSwapping(letters, thumbnails) {
-  const maxImagesInTitle = 4; // Maximum 4 images in the title at once (all 4 e's can flicker)
+  const letterNodes = Array.from(letters);
+  const swappableLetters = letterNodes.filter(l => l.dataset.swappable === 'true');
+  const maxImagesInTitle = swappableLetters.length; // cap at number of available letters
   let lastChangedIndex = -1; // Track which letter was last changed
   
-  function canPlaceImageAtIndex(index) {
-    const letter = letters[index];
-    // Only allow swapping on 'e' letters
-    if (letter.dataset.swappable !== 'true') {
+  function canPlaceImage(letterNode) {
+    if (letterNode.dataset.swappable !== 'true') {
       return false;
     }
     
-    // Check if there are already max images
-    const currentImages = Array.from(letters).filter(l => l.classList.contains('image-mode')).length;
+    const currentImages = letterNodes.filter(l => l.classList.contains('image-mode')).length;
     if (currentImages >= maxImagesInTitle) {
       return false;
     }
     
-    // Check if adjacent letters have images
-    const prevHasImage = index > 0 && letters[index - 1].classList.contains('image-mode');
-    const nextHasImage = index < letters.length - 1 && letters[index + 1].classList.contains('image-mode');
-    
-    if (prevHasImage || nextHasImage) {
+    const index = letterNodes.indexOf(letterNode);
+    if (index === -1) {
       return false;
     }
     
-    return true;
+    const prevHasImage = index > 0 && letterNodes[index - 1].classList.contains('image-mode');
+    const nextHasImage = index < letterNodes.length - 1 && letterNodes[index + 1].classList.contains('image-mode');
+    
+    return !(prevHasImage || nextHasImage);
   }
   
   function swapRandomLetter() {
-    // Get all 'e' letters
-    const swappableLetters = Array.from(letters).filter(l => l.dataset.swappable === 'true');
-    
     // Find letters that can be changed (excluding the last changed one)
     const availableToChange = [];
     
     swappableLetters.forEach((letter, idx) => {
-      const letterIndex = parseInt(letter.dataset.index);
+      const letterIndex = letterNodes.indexOf(letter);
       
       if (letter.classList.contains('image-mode')) {
         // Already an image - can restore to text if not the last changed
         if (letterIndex !== lastChangedIndex) {
           availableToChange.push({letter, letterIndex, action: 'restore'});
         }
-      } else if (canPlaceImageAtIndex(letterIndex) && letterIndex !== lastChangedIndex) {
+      } else if (letterIndex !== -1 && letterIndex !== lastChangedIndex && canPlaceImage(letter)) {
         // Can convert to image if not the last changed
         availableToChange.push({letter, letterIndex, action: 'convert'});
       }
@@ -147,4 +160,14 @@ function startLetterSwapping(letters, thumbnails) {
   setInterval(() => {
     swapRandomLetter();
   }, 400 + Math.random() * 600); // Between 0.4-1 seconds
+}
+
+function lockLetterWidths(letters) {
+  letters.forEach(letter => {
+    const rect = letter.getBoundingClientRect();
+    if (!rect.width) return;
+    letter.dataset.letterWidth = rect.width;
+    letter.style.display = "inline-block";
+    letter.style.width = `${rect.width}px`;
+  });
 }

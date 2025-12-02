@@ -22,6 +22,12 @@ body {
   justify-content: center;
   text-align: center;
   padding: 2rem;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.86)),
+    url('1-landing.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #landing h1 {

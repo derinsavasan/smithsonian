@@ -122,12 +122,11 @@ function renderGrid() {
   revealCardsSequentially(cards);
   // Fade in hint once cards are placed
   const revealDelay = Math.max(0, (cards.size() - 1) * 70 + 200);
-  hintContainer
-    .style('display', 'block')
-    .style('opacity', 0);
   setTimeout(() => {
-    hintContainer.classed('hidden', false);
-    hintContainer.style('opacity', 1);
+    hintContainer
+      .classed('hidden', false)
+      .classed('visible', true)
+      .style('opacity', 1);
   }, revealDelay);
 }
 
@@ -266,7 +265,12 @@ function resetGame() {
   gameOver = false;
   hintIndex = 0;
   d3.select('#message').style('display', 'none');
-  hintContainer.text(categoryHint).classed('hidden', true).style('opacity', 0).style('display', 'block');
+  hintContainer
+    .text(categoryHint)
+    .classed('hidden', true)
+    .classed('visible', false)
+    .style('opacity', 0)
+    .style('display', 'block');
   d3.selectAll('.card').classed('blurred', false).classed('correct', false).classed('selected', false).classed('incorrect', false);
   renderGrid();
 }
@@ -284,7 +288,11 @@ function startGame() {
   overlay.classed('hidden', true);
   gameShell.classed('game-active', true);
   statsContainer.classed('hidden', false);
-  hintContainer.classed('hidden', true).style('opacity', 0).style('display', 'block');
+  hintContainer
+    .classed('hidden', true)
+    .classed('visible', false)
+    .style('opacity', 0)
+    .style('display', 'block');
   pickCategory();
   resetGame();
 }

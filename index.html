@@ -34,95 +34,70 @@
       <p>This project treats those portraits as data. Each dot marks a portrait made during or soon after the Revolution. Dates were standardized for consistency. Together, they chart fluctuations in portrait production of a young nation trying to find its face.</p>
     </div>
   </section>
-  
-  <!-- Main Scrollytelling Area -->
-  <div id="scrollytelling">
-    
-    <!-- Fixed Chart -->
-    <div id="chart-fixed">
-      <svg id="viz"></svg>
-      <div class="washington-portrait" id="washington-portrait">
-        <img src="https://ids.si.edu/ids/deliveryService?id=NPG-NPG_2001_13_ext" alt="George Washington portrait by Gilbert Stuart">
-      </div>
-    </div>
-    
-    <!-- Scrollable Story -->
-    <div id="story">
-      
-      <section class="step" data-step="timeline">
-        <!-- Empty - just show chart loading -->
-      </section>
-      
-      <section class="step" data-step="spike-1795">
-        <div class="text-box">
-          <p>1795 was the year America sat for its portrait. Painter <span class="gilbert-stuart">Gilbert Stuart</span> showed up in Philly and suddenly every Revolutionary hero wanted their face on a canvas. His George Washington portrait became the reference image, getting practically Xeroxed across the new republic.</p>
-        </div>
-      </section>
-      
-      <section class="step" data-step="filter">
-        <div class="text-box filter-section">
-          <div class="filter-left">
-            <p class="filter-prompt">
-              Sort the collection by <span id="d3-dropdown-container"></span>
-            </p>
-          </div>
-        </div>
-      </section>
-      
-      <section class="step" data-step="explanations">
-        <div class="filter-explanations">
-          <div class="filter-explanation" data-category="size">
-            <p>In early America, size was status. Miniatures lived in pockets and lockets, meant to be held, not seen. Full-size portraits hung in parlors and state rooms, built for public memory.</p>
-          </div>
-          
-          <div class="filter-explanation" data-category="artist">
-            <p>As Jay-Z put it, "I'm not a businessman, I'm a business, man." The known artists stamped themselves into history, preserving their face and signature. The unknown ones didn't get as lucky.</p>
-          </div>
-          
-          <div class="filter-explanation" data-category="sitter">
-            <p>Some names were recorded because they mattered. When the sitter is unnamed, it says just as much: someone paid for the portrait, but not enough value was placed on the person's name to preserve it.</p>
-          </div>
-          
-          <div class="filter-explanation" data-category="gender">
-            <p>The ratio skews male. That tells you less about population and more about who portrait culture considered worth recording. Unless you were the wife of a man who mattered, of course.</p>
-          </div>
-        </div>
-      </section>
-      
-      <section class="step" data-step="end">
-        <!-- Empty spacer -->
-      </section>
-      
-    </div>
+
+  <div class="transition-arrow">
+    <span class="scroll-arrow">↓</span>
   </div>
   
-  <!-- Post-chart explanatory text -->
-  <section id="post-chart-text">
-    <div class="intro-text visible">
-      <p class="intro-p">You’ve seen the trends. Now try spotting them yourself. First, guess the category. Then pick the portraits that fit. If you get stuck, the hints will nudge you.</p>
+  <!-- Timeline & Filters -->
+  <section id="timeline-section">
+    <div class="timeline-layout">
+      <p class="filter-prompt timeline-prompt">
+        Sort the collection by <span id="d3-dropdown-container"></span>
+      </p>
+      <div id="chart-fixed">
+        <svg id="viz"></svg>
+      </div>
+      <div class="filter-explanations">
+        <div class="filter-explanation" data-category="none">
+          <p>1795 was the year America sat for its portrait. Painter Gilbert Stuart showed up in Philly and suddenly every Revolutionary hero wanted their face on a canvas. His George Washington portrait became the reference image, getting practically Xeroxed across the new republic.</p>
+        </div>
+        
+        <div class="filter-explanation" data-category="size">
+          <p>In early America, size was status. Miniatures lived in pockets and lockets, meant to be held, not seen. Full-size portraits hung in parlors and state rooms, built for public memory.</p>
+        </div>
+        
+        <div class="filter-explanation" data-category="artist">
+          <p>As Jay-Z put it, "I'm not a businessman, I'm a business, man." The known artists stamped themselves into history, preserving their face and signature. The unknown ones didn't get as lucky.</p>
+        </div>
+        
+        <div class="filter-explanation" data-category="sitter">
+          <p>Some names were recorded because they mattered. When the sitter is unnamed, it says just as much: someone paid for the portrait, but not enough value was placed on the person's name to preserve it.</p>
+        </div>
+        
+        <div class="filter-explanation" data-category="gender">
+          <p>The ratio skews male. That tells you less about population and more about who portrait culture considered worth recording. Unless you were the wife of a man who mattered, of course.</p>
+        </div>
+      </div>
     </div>
   </section>
+
+  <div class="transition-arrow transition-arrow-post-chart">
+    <span class="scroll-arrow">↓</span>
+  </div>
   
   <!-- Memory Game Section -->
   <section id="memory-game-section">
+    <!-- Game Intro Overlay -->
+    <div class="game-intro-overlay">
+      <div class="game-intro-box">
+        <p class="game-intro-text">You've seen the trends. Now try spotting them yourself.<br>First, guess the category. Then pick the portraits that fit.<br><span class="highlight">If you get stuck, the hints will nudge you.</span></p>
+        <button id="startGame" class="game-button">Start the Game</button>
+      </div>
+    </div>
+    
     <div class="memory-game-container">
       <div id="game-shell">
         <div id="game-board">
           <div id="app"></div>
-          <div id="game-overlay" class="game-overlay">
-            <div class="overlay-controls">
-              <button id="startGame" class="game-button visible" disabled>Start the Game</button>
-            </div>
+          <div id="game-overlay" class="game-overlay hidden">
             <div id="loading">Loading game...</div>
           </div>
         </div>
       </div>
       <aside class="game-sidebar">
-        <div id="stats" class="hidden">
-          <span>Strikes: <span id="strikes">0</span>/5</span>
-        </div>
-        <div id="message"></div>
         <div id="hintMessage" class="hidden"></div>
+        <div id="message"></div>
         <button id="playAgain" disabled>Play Again</button>
       </aside>
     </div>

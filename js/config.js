@@ -1,7 +1,7 @@
 // Remember Me - Configuration
 export const CONFIG = {
   dimensions: {
-    margin: { top: 100, right: 100, bottom: 140, left: 100 }
+    margin: { top: 280, right: 100, bottom: 350, left: 100 }
   },
   
   timeline: {
@@ -11,7 +11,7 @@ export const CONFIG = {
   },
   
   animation: {
-    transitionDuration: 800  // Keep chart animations but remove section transitions
+    transitionDuration: 250  // Snappy chart animations
   },
   
   tooltip: {

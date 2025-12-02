@@ -1,7 +1,6 @@
 // Remember Me - Dropdown Component
 import { applyFilter } from './filters.js';
 import { CONFIG } from './config.js';
-import { unhighlightDots } from './chart.js';
 
 let isOpen = false;
 let currentFilter = 'none';
@@ -28,16 +27,16 @@ function showCategoryExplanation(category) {
   const explanations = document.querySelectorAll('.filter-explanation');
   explanations.forEach(exp => exp.classList.remove('visible'));
   
-  if (category !== "none") {
-    const relevantExplanation = document.querySelector(`.filter-explanation[data-category="${category}"]`);
-    if (relevantExplanation) {
-      relevantExplanation.classList.add('visible');
-    }
+  const relevantExplanation = document.querySelector(`.filter-explanation[data-category="${category}"]`);
+  if (relevantExplanation) {
+    relevantExplanation.classList.add('visible');
   }
 }
 
 export function createDropdown() {
+  isOpen = false;
   const container = d3.select("#d3-dropdown-container");
+  container.selectAll("*").remove();
   
   // Create SVG - display only button height, menu overflows via CSS
   const svg = container.append("svg")
@@ -78,7 +77,7 @@ export function createDropdown() {
     .attr("font-size", "22px")
     .attr("font-weight", "600")
     .style("pointer-events", "none")
-    .text("this dropdown");
+    .text("Timeline View");
   
   // Arrow
   const arrow = buttonGroup.append("text")
@@ -203,16 +202,6 @@ export function createDropdown() {
         .attr("d", roundedPath);
     }
     
-    // Hide spike text when a category is selected
-    if (d.id !== "none") {
-      const spikeTextBox = document.querySelector('[data-step="spike-1795"] .text-box');
-      if (spikeTextBox) {
-        spikeTextBox.classList.remove("visible");
-      }
-      // Remove 1795 blue highlight when selecting a category
-      unhighlightDots();
-    }
-    
     // Show explanation
     showCategoryExplanation(d.id);
     
@@ -239,7 +228,7 @@ export function createDropdown() {
 export function resetDropdown() {
   if (buttonText && buttonBg) {
     currentFilter = 'none';
-    buttonText.text("this dropdown");
+    buttonText.text("Timeline View");
     buttonBg
       .attr("fill", "#000")
       .attr("d", "M 22 0 L 178 0 Q 200 0 200 22 L 200 22 Q 200 44 178 44 L 22 44 Q 0 44 0 22 L 0 22 Q 0 0 22 0 Z");

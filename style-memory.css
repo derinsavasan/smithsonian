@@ -9,6 +9,10 @@ body {
   padding-top: 70px;
 }
 
+#memory-game-section {
+  position: relative;
+}
+
 header {
   position: fixed;
   top: 0;
@@ -26,33 +30,30 @@ header {
 .memory-game-container {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  gap: 2.5rem;
-  padding: 2.5rem 1rem 4rem;
+  align-items: flex-end;
+  gap: 2rem;
+  padding: 1.5rem 1rem 2rem;
+  min-height: calc(100vh - 80px);
   flex-wrap: wrap;
 }
 
 #game-shell {
   flex: 0 1 auto;
-  background: #fff;
-  border-radius: 18px;
-  padding: 0.75rem;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
 }
 
 #game-shell.game-active {
-  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.12);
 }
 
 #game-board {
   position: relative;
-  width: min(58vw, 620px);
-  height: min(58vw, 620px);
-  border-radius: 18px;
-  background: #fff;
-  padding: 6px;
+  width: min(56vw, 600px);
+  height: min(56vw, 600px);
+  padding: 4px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
+  background: transparent;
+  border-radius: 18px;
+  box-shadow: none;
 }
 
 .game-overlay {
@@ -66,7 +67,6 @@ header {
   text-align: center;
   gap: 0.9rem;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  border-radius: inherit;
   padding: 6px;
   box-sizing: border-box;
 }
@@ -75,6 +75,7 @@ header {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  display: none;
 }
 
 .overlay-controls {
@@ -104,13 +105,9 @@ header {
 }
 
 .game-button {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.game-button.visible {
-  display: inline-flex;
 }
 
 .game-button:disabled,
@@ -147,16 +144,20 @@ header {
   flex-direction: column;
   gap: 1rem;
   font-size: 1rem;
-  padding: 0;
+  padding: 0 0 0.5rem;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
+  align-self: flex-end;
+  align-items: flex-start;
 }
 
 #stats {
   font-size: 1.2rem;
   font-weight: 600;
   color: #111;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 #message {
@@ -164,6 +165,7 @@ header {
   font-weight: 700;
   color: #111;
   display: none;
+  margin-bottom: 0.5rem;
 }
 
 #hintMessage {
@@ -175,7 +177,8 @@ header {
   background: rgba(0, 0, 255, 0.05);
   border-left: 4px solid #0000FF;
   padding: 0.65rem 0.85rem;
-  border-radius: 12px;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
 }
 
 #playAgain {
@@ -188,11 +191,10 @@ header {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  padding: 10px;
-  min-height: 100%;
+  padding: 0;
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 .card {
@@ -200,21 +202,23 @@ header {
   aspect-ratio: 1;
   background-size: cover;
   background-position: center;
-  border-radius: 6px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  background-color: #ddd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  border: 1.5px solid #ccc;
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+  box-sizing: border-box;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  contain: layout paint;
   transition: transform 0.18s, border-color 0.18s, opacity 0.25s ease;
 }
 
 .card:hover {
-  transform: scale(1.03);
+  transform: none;
 }
 
 .card.selected {
@@ -222,7 +226,7 @@ header {
   border-width: 4px;
   border-style: solid;
   box-shadow: 0 0 0 6px rgba(30,102,255,0.10), 0 8px 16px rgba(0,0,0,0.12);
-  transform: translateY(-3px) scale(1.02);
+  transform: none;
 }
 
 .card.correct {
@@ -241,6 +245,8 @@ header {
 
 .card.incorrect {
   border-color: red;
+  border-width: 4px;
+  border-style: solid;
   background-color: lightcoral;
 }
 
@@ -256,6 +262,7 @@ header {
   width: 100%;
   height: 100%;
   background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
   justify-content: flex-end;
 }

@@ -38,10 +38,13 @@ export function drawVisualization(width, height, allPortraits) {
   // Prepare plot data
   const plotData = prepareChartData(xScale, chartHeight);
   
-  // Draw X axis (visible from start)
+  // Timeline view offset - pushes the initial timeline view lower
+  const timelineYOffset = 60;
+  
+  // Draw X axis (visible from start) - positioned with timeline offset
   const xAxis = g.append("g")
     .attr("class", "x-axis")
-    .attr("transform", `translate(0, ${chartHeight})`)
+    .attr("transform", `translate(0, ${chartHeight + timelineYOffset})`)
     .style("opacity", 1)
     .call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
   
@@ -52,14 +55,14 @@ export function drawVisualization(width, height, allPortraits) {
   // Create tooltip
   createTooltip();
   
-  // Draw dots (visible from start)
+  // Draw dots (visible from start) - positioned with timeline offset
   const dots = g.selectAll(".portrait-dot")
     .data(plotData)
     .enter()
     .append("circle")
     .attr("class", "portrait-dot")
     .attr("cx", d => d.xPos)
-    .attr("cy", d => d.yPos)
+    .attr("cy", d => d.yPos + timelineYOffset)
     .attr("r", dotRadius)
     .attr("fill", "#000")
     .attr("stroke", "none")

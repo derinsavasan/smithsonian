@@ -19,10 +19,12 @@ export function applyFilter(filterType) {
   g.selectAll(".divider-line").remove();
   
   if (filterType === "none") {
-    // Return to timeline view
+    // Return to timeline view - position lower in the viewing window
+    const timelineYOffset = -80; // Adjust to position timeline view
+    
     xAxis.transition()
       .duration(transitionDuration)
-      .attr("transform", `translate(0, ${chartHeight})`);
+      .attr("transform", `translate(0, ${chartHeight + timelineYOffset})`);
     
     // Move labels back to original position
     xAxis.selectAll("text")
@@ -32,11 +34,11 @@ export function applyFilter(filterType) {
       .attr("y", 9)
       .style("opacity", 1);
     
-    // Return dots to original positions
+    // Return dots to original positions, shifted down
     dots.transition()
       .duration(transitionDuration)
       .ease(d3.easeCubicInOut)
-      .attr("cy", d => d.yPos)
+      .attr("cy", d => d.yPos + timelineYOffset)
       .attr("opacity", 1)
       .attr("r", dotRadius)
       .attr("fill", "#000");
@@ -118,8 +120,9 @@ export function applyFilter(filterType) {
 // Calculate layout for categorical view
 function calculateCategoricalLayout(plotData, xScale, chartHeight, categories, getCategoryValue) {
   const { dotSpacing } = CONFIG.timeline;
-  const startOffset = 20;
-  const topPadding = 180;
+  const startOffset = 24;
+  const minTopPadding = 100;  // Minimum space from top of chart (increased for filter views)
+  const minBottomPadding = 80;  // Minimum space from bottom of chart
   
   // Group by year
   const grouped = d3.group(plotData, d => d.year);
@@ -143,14 +146,21 @@ function calculateCategoricalLayout(plotData, xScale, chartHeight, categories, g
     maxLowerCount = Math.max(maxLowerCount, categorized[categories[1]].length);
   });
   
-  // Calculate dynamic axis position
+  // Calculate required heights for each direction
   const upperHeight = maxUpperCount * dotSpacing + startOffset;
   const lowerHeight = maxLowerCount * dotSpacing + startOffset;
-  const dynamicAxisY = topPadding + upperHeight;
-  const requiredBottomSpace = lowerHeight + 40;
-  const minBottomSpace = Math.max(120, requiredBottomSpace);
-  const maxAxisY = chartHeight - minBottomSpace;
-  const axisY = Math.min(dynamicAxisY, maxAxisY);
+  const totalDataHeight = upperHeight + lowerHeight;
+  
+  // Calculate available space
+  const availableHeight = chartHeight - minTopPadding - minBottomPadding;
+  
+  // Calculate axis position to center the data vertically
+  // The axis should be positioned so both stacks fit with proportional spacing
+  const upperRatio = upperHeight / totalDataHeight;
+  const axisY = minTopPadding + (availableHeight * upperRatio);
+  
+  // Ensure axis stays within reasonable bounds
+  const finalAxisY = Math.max(minTopPadding + upperHeight, Math.min(chartHeight - minBottomPadding - lowerHeight, axisY));
   
   // Position dots
   const newPositions = [];
@@ -172,7 +182,7 @@ function calculateCategoricalLayout(plotData, xScale, chartHeight, categories, g
     categorized[categories[0]].forEach((d, i) => {
       newPositions.push({
         ...d,
-        newY: axisY - startOffset - (i * dotSpacing),
+        newY: finalAxisY - startOffset - (i * dotSpacing),
         category: categories[0]
       });
     });
@@ -181,13 +191,13 @@ function calculateCategoricalLayout(plotData, xScale, chartHeight, categories, g
     categorized[categories[1]].forEach((d, i) => {
       newPositions.push({
         ...d,
-        newY: axisY + startOffset + (i * dotSpacing),
+        newY: finalAxisY + startOffset + (i * dotSpacing),
         category: categories[1]
       });
     });
   });
   
-  return { newPositions, axisY };
+  return { newPositions, axisY: finalAxisY };
 }
 
 // Add divider line at axis position

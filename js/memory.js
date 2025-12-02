@@ -183,7 +183,6 @@ function resetGame() {
   selected = [];
   gameOver = false;
   hintIndex = 0;
-  d3.select('#strikes').text(0);
   d3.select('#message').style('display', 'none');
   hintContainer.text(categoryHint).style('display', 'block');
   d3.selectAll('.card').classed('blurred', false).classed('correct', false).classed('selected', false).classed('incorrect', false);
@@ -197,6 +196,8 @@ function startGame() {
   if (!data.length) {
     return;
   }
+  d3.select('.game-intro-overlay').classed('hidden', true);
+  d3.select('#game-board').classed('visible', true);
   startButton.classed('visible', false).attr('disabled', true);
   overlay.classed('hidden', true);
   gameShell.classed('game-active', true);

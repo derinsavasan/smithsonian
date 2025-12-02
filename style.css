@@ -14,6 +14,7 @@ body {
 
 /* Landing Section */
 #landing {
+  position: relative;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -104,11 +105,12 @@ body {
 
 /* Intro Section */
 #intro {
-  min-height: 60vh;
+  position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 2rem;
+  padding: 4rem 2rem 5rem;
   background: white;
 }
 
@@ -135,22 +137,60 @@ body {
   margin-bottom: 0;
 }
 
-/* Scrollytelling */
-#scrollytelling {
+.transition-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0 0.5rem;
   position: relative;
-  min-height: 150vh;
+  z-index: 5;
 }
 
-/* FIXED Chart - stays in place */
+.transition-arrow .scroll-arrow {
+  font-size: 1.5rem;
+  color: #0000FF;
+  border: none;
+  width: auto;
+  height: auto;
+  padding: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  animation: scrollPulse 1.4s ease-in-out infinite;
+}
+
+/* Timeline Section */
+#timeline-section {
+  position: relative;
+  min-height: 100vh;
+  padding: 1.5rem 1.5rem 4rem;
+  background: white;
+}
+
+.timeline-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+}
+
 #chart-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  height: 160vh;
+  margin-top: -200px;
   background: white;
   z-index: 1;
-  display: none; /* Hidden by default until user scrolls past intro */
+  display: block;
+  overflow: visible;
+  padding: 0;
 }
 
 #viz {
@@ -158,88 +198,13 @@ body {
   height: 100%;
 }
 
-/* Scrollable Story - on top of chart */
-#story {
-  position: relative;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.step {
-  min-height: 70vh;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0 2rem 3rem 2rem;
-}
-
-.text-box {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 800px;
-  padding: 20px 30px;
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 10;
-}
-
-[data-step="spike-1795"] .text-box {
-  position: fixed;
-  top: auto;
-  left: 3%;
-  bottom: calc(100vh - 250px);
-  transform: none;
-  max-width: 750px;
-  padding: 20px 30px;
-}
-
-.washington-portrait {
+.timeline-prompt {
   position: absolute;
-  top: 50px;
-  right: 50px;
-  width: 180px;
-  height: auto;
-  max-height: 280px;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 11;
-  transition: opacity 0.8s ease;
-  visibility: visible;
-}
-
-.washington-portrait.visible {
-  opacity: 1;
-}
-
-.washington-portrait img {
-  width: 100%;
-  height: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 2px;
-}
-
-.text-box.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.8s ease;
-}
-
-.text-box h2 {
-  font-size: 2.1rem;
-  margin-bottom: 1rem;
-  color: #000;
-}
-
-.text-box p {
-  font-size: 1.32rem;
-  line-height: 1.7;
-  margin-bottom: 1rem;
-  color: #000;
+  top: 80px;
+  left: 100px;
+  z-index: 10;
+  font-size: 1.5rem;
+  margin: 0;
 }
 
 /* Highlighted text */
@@ -264,13 +229,10 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   gap: 3rem;
-  max-width: none;
-  width: auto;
-  left: 3%;
-  right: 3%;
-  transform: none;
-  padding: 20px 30px;
-  margin-top: -10px;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0;
+  margin: 0 auto;
 }
 
 .filter-left {
@@ -280,42 +242,52 @@ body {
 }
 
 .filter-explanations {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 900px;
-  width: 90%;
+  position: absolute;
+  top: 80px;
+  right: 40px;
+  max-width: 380px;
+  width: auto;
   pointer-events: none;
-  z-index: 15;
+  z-index: 10;
   padding-bottom: 0;
 }
 
 .filter-explanation {
+  display: none;
   opacity: 0;
   pointer-events: none;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   width: 100%;
-  text-align: center;
-  background: transparent;
-  padding: 0;
-  border-radius: 0;
-  box-shadow: none;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border-left: 3px solid #0000FF;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .filter-explanation.visible {
+  display: block;
   opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.8s ease;
+  pointer-events: none;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filter-explanation p {
-  font-size: 1.3rem;
-  line-height: 1.7;
-  color: #0000FF;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #333;
   margin: 0;
 }
 
@@ -359,13 +331,8 @@ body {
   align-items: center;
   vertical-align: middle;
   overflow: visible;
-  opacity: 0;
-  visibility: hidden;
-}
-
-#d3-dropdown-container.visible {
-  opacity: 1;
-  visibility: visible;
+  position: relative;
+  z-index: 5;
 }
 
 .filter-container-inline {
@@ -387,6 +354,24 @@ body {
 }
 
 /* Memory Game Section */
+/* Post-chart transition arrow - pulls up into chart area */
+.transition-arrow-post-chart {
+  margin-top: -30vh;
+  position: relative;
+  z-index: 5;
+}
+
+/* Post-chart explanatory text */
+#post-chart-text {
+  background: white;
+  padding: 3rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+}
+
 #memory-game-section {
   min-height: 100vh;
   background: white;
@@ -578,14 +563,90 @@ body {
   font-weight: 500;
 }
 
+/* Game Intro Box Styling */
+.game-intro-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  gap: 2rem;
+}
+
+.game-intro-text {
+  font-size: 1.3rem;
+  line-height: 1.7;
+  max-width: 860px;
+  margin: 0;
+  color: #000;
+  font-family: 'Cabin', Arial, sans-serif;
+  font-weight: 400;
+}
+
+.game-intro-box .game-button {
+  padding: 0.75rem 1.7rem;
+  font-size: 1.32rem;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: 'Cabin', Arial, sans-serif;
+  font-weight: 600;
+  transition: background 0.2s ease;
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-intro-box .game-button:hover {
+  background: #0000FF;
+}
+
+.game-intro-box .game-button:active {
+  background: #000;
+}
+
+#game-board {
+  display: none;
+}
+
+#game-board.visible {
+  display: block;
+}
+
+#game-shell.game-active .game-intro-box {
+  display: none;
+}
+
+.game-intro-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.98);
+  z-index: 9999;
+  backdrop-filter: blur(0px);
+}
+
+.game-intro-overlay.hidden {
+  display: none;
+}
+
 @media (max-width: 768px) {
   #landing h1 {
     font-size: 6rem;
   }
   
   #intro {
-    padding: 2rem 1rem;
-    min-height: 70vh;
+    padding: 2rem 1rem 3rem;
   }
   
   .intro-text {
@@ -609,8 +670,21 @@ body {
     font-size: 1.1rem;
   }
   
+  .filter-explanations {
+    top: auto;
+    right: auto;
+    position: relative;
+    max-width: 100%;
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+  
+  .filter-explanation {
+    padding: 1rem;
+  }
+  
   .filter-explanation p {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
   .filter-prompt {
@@ -627,6 +701,19 @@ body {
   
   .memory-intro p {
     font-size: 1rem;
+  }
+  
+  .timeline-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-column {
+    position: relative;
+    top: auto;
+  }
+  
+  #chart-fixed {
+    height: 65vh;
   }
   
   #app {

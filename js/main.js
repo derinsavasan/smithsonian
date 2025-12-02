@@ -3,6 +3,7 @@ import { processData } from './dataProcessor.js';
 import { initializeSVG, drawVisualization } from './chart.js';
 import { setupScrollObserver, setupIntroAnimations, setupDropdownFilter, setupPortraitModal } from './interactions.js';
 import * as tooltipModule from './tooltip.js';
+import { applyFilter } from './filters.js';
 
 console.log("=== Remember Me ===");
 
@@ -16,19 +17,17 @@ window.addEventListener('DOMContentLoaded', init);
 
 function init() {
   console.log("Initializing...");
-  
-  // Ensure chart is hidden on initial load
+
   const chartFixed = document.getElementById("chart-fixed");
-  if (chartFixed) {
-    chartFixed.style.display = "none";
-  }
-  
-  // Set dimensions
-  width = window.innerWidth;
-  height = window.innerHeight;
+  const rect = chartFixed ? chartFixed.getBoundingClientRect() : null;
+  width = rect ? rect.width : window.innerWidth;
+  height = rect ? rect.height : window.innerHeight * 0.75;
   
   // Initialize SVG
   initializeSVG(width, height);
+  
+  // Setup scroll direction detection for arrows
+  setupScrollDirectionArrows();
   
   // Load data
   d3.csv("data/portraits_v1.csv").then(data => {
@@ -36,12 +35,28 @@ function init() {
     const portraits = processData(data);
     drawVisualization(width, height, portraits);
     setupScrollObserver();
-    setupDropdownFilter();
     setupIntroAnimations();
     setupTitleAnimation(data);
   }).catch(err => {
     console.error("Error loading data:", err);
   });
+}
+
+// Detect scroll direction and update arrow directions
+function setupScrollDirectionArrows() {
+  let lastScrollY = window.scrollY;
+  const arrows = document.querySelectorAll('.scroll-arrow');
+  
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+    const scrollingDown = currentScrollY > lastScrollY;
+    
+    arrows.forEach(arrow => {
+      arrow.textContent = scrollingDown ? '↓' : '↑';
+    });
+    
+    lastScrollY = currentScrollY;
+  }, { passive: true });
 }
 
 // Setup animated title with portrait swapping

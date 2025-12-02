@@ -4,13 +4,52 @@ let selected = [];
 let strikes = 0;
 let gameOver = false;
 let hintIndex = 0;
-const categoryHint = "Sometimes the easiest model to paint is the one who’s always available.";
-const hints = [
-  "When the gaze feels deliberate, almost confrontational, it usually means the painter is looking straight into a mirror.",
-  "Look for sitters dressed more plainly than usual. Artists often painted themselves in simple clothes.",
-  "Check for faces lit from one side. The light often comes from a studio window or mirror setup.",
-  "Not all of these were studio scenes. One sits out in the open."
-];
+
+const categoriesConfig = {
+  self: {
+    name: "Self-Portraits",
+    isCorrect: (d) => d.is_self_portrait === 'TRUE',
+    categoryHint: "Sometimes the easiest model to paint is the one who’s always available.",
+    hints: [
+      "When the gaze feels deliberate, almost confrontational, it usually means the painter is looking straight into a mirror.",
+      "Look for sitters dressed more plainly than usual. Artists often painted themselves in simple clothes.",
+      "Check for faces lit from one side. The light often comes from a studio window or mirror setup.",
+      "Not all of these were studio scenes. One sits out in the open."
+    ],
+    revealText: 'Final Reveal<br>Correct 4 portraits<br>These are self-portraits where the artist painted themselves.'
+  },
+  military: {
+    name: "Ranked Military",
+    isCorrect: (d) => {
+      const names = [
+        'captain charles mcknight',
+        'charles mcknight',
+        'john h. seward',
+        'joseph anthony',
+        'robert lillibridge',
+        'benjamin stephenson',
+        'john cox',
+        'john cadwalader',
+        'giles',
+        'anthony wayne'
+      ];
+      const fields = [d.title, d.sitter, d.artist, d.size, d.gender].map(v => (v || '').toLowerCase());
+      return fields.some(f => names.some(name => f.includes(name)));
+    },
+    categoryHint: "Look for uniforms: these sitters wore a commission.",
+    hints: [
+      "Rank shows up in the shoulders. Epaulettes, straps, and brass tend to give it away.",
+      "Military sitters rarely soften their posture. The stance is straight, almost drilled.",
+      "Weapons aren't required, but swords and scabbards are reliable tells when they appear.",
+      "Backgrounds often stay sparse. Consider black as sparse here."
+    ],
+    revealText: 'Final Reveal<br>Correct 4 portraits<br>These are ranked military sitters.'
+  }
+};
+let nextCategoryIndex = 0;
+let currentCategory = 'self';
+let categoryHint = categoriesConfig.self.categoryHint;
+let hints = categoriesConfig.self.hints.slice();
 
 const startButton = d3.select('#startGame');
 const playAgainButton = d3.select('#playAgain');
@@ -19,6 +58,15 @@ const gameShell = d3.select('#game-shell');
 const statsContainer = d3.select('#stats');
 const hintContainer = d3.select('#hintMessage');
 
+function pickCategory() {
+  const keys = Object.keys(categoriesConfig);
+  const cat = keys[nextCategoryIndex % keys.length];
+  nextCategoryIndex += 1;
+  currentCategory = cat;
+  categoryHint = categoriesConfig[cat].categoryHint;
+  hints = categoriesConfig[cat].hints.slice();
+}
+
 // Load data and prime the UI
 d3.csv("data/portraits_v1.csv").then(loadedData => {
   data = loadedData;
@@ -26,20 +74,35 @@ d3.csv("data/portraits_v1.csv").then(loadedData => {
   startButton.attr('disabled', null);
 }).catch(() => {
   d3.select('#loading').text('Unable to load portraits right now.');
+  startButton.attr('disabled', null);
 });
 
 // Render the 4x4 grid
 function renderGrid() {
-  const selfPortraits = data.filter(d => d.is_self_portrait === 'TRUE');
-  const nonSelfPortraits = data.filter(d => d.is_self_portrait === 'FALSE');
+  const config = categoriesConfig[currentCategory];
+  const isWestFamily = (d) => (d.title || '').toLowerCase().includes('west family');
+  // Exclude West family from non-self categories entirely
+  const pool = currentCategory === 'self' ? data : data.filter(d => !isWestFamily(d));
 
-  // Select 4 random self-portraits out of the available ones
-  const selectedSelf = d3.shuffle(selfPortraits.slice()).slice(0, 4);
-  // Select 12 random non-self
-  const selectedNonSelf = d3.shuffle(nonSelfPortraits.slice()).slice(0, 12);
+  // Build correct pool based on category
+  const correctPool = pool.filter(d => config.isCorrect(d));
 
-  // Combine and shuffle
-  const gameData = d3.shuffle(selectedSelf.concat(selectedNonSelf));
+  let selectedCorrect = [];
+  if (currentCategory === 'self') {
+    const westFamily = correctPool.find(d => (d.title || '').toLowerCase().includes('west family'));
+    const remainingSelf = correctPool.filter(d => d !== westFamily);
+    if (westFamily) selectedCorrect.push(westFamily);
+    selectedCorrect.push(...d3.shuffle(remainingSelf.slice()).slice(0, Math.max(0, 4 - selectedCorrect.length)));
+  } else {
+    selectedCorrect = d3.shuffle(correctPool.slice()).slice(0, 4);
+  }
+
+  // Fill remaining with incorrect
+  const incorrectPool = pool.filter(d => !config.isCorrect(d) && !selectedCorrect.includes(d));
+  const neededIncorrect = 16 - selectedCorrect.length;
+  const selectedIncorrect = d3.shuffle(incorrectPool.slice()).slice(0, neededIncorrect);
+
+  const gameData = d3.shuffle(selectedCorrect.concat(selectedIncorrect));
 
   const app = d3.select("#app");
   app.selectAll(".card").remove();
@@ -49,7 +112,7 @@ function renderGrid() {
     .enter()
     .append("div")
     .attr("class", "card")
-    .attr("data-is-self", d => d.is_self_portrait)
+    .attr("data-is-correct", d => config.isCorrect(d) ? 'true' : 'false')
     .on("click", handleSelect);
 
   cards.append("div")
@@ -57,6 +120,15 @@ function renderGrid() {
     .style("background-image", d => `url(${d.thumbnail})`);
   
   revealCardsSequentially(cards);
+  // Fade in hint once cards are placed
+  const revealDelay = Math.max(0, (cards.size() - 1) * 70 + 200);
+  hintContainer
+    .style('display', 'block')
+    .style('opacity', 0);
+  setTimeout(() => {
+    hintContainer.classed('hidden', false);
+    hintContainer.style('opacity', 1);
+  }, revealDelay);
 }
 
 // Handle card selection
@@ -87,9 +159,9 @@ function handleSelect() {
 
 // Check if selected are all self-portraits
 function checkMatch() {
-  const allSelf = selected.every(card => d3.select(card).attr('data-is-self') === 'TRUE');
+  const allCorrect = selected.every(card => d3.select(card).attr('data-is-correct') === 'true');
 
-  if (allSelf) {
+  if (allCorrect) {
     // Correct - start victory reveal
     victoryReveal();
   } else {
@@ -97,14 +169,24 @@ function checkMatch() {
     strikes++;
     d3.select('#strikes').text(strikes);
     // Eliminate incorrect cards that were selected
-    const incorrectSelected = selected.filter(card => d3.select(card).attr('data-is-self') !== 'TRUE');
+    const incorrectSelected = selected.filter(card => d3.select(card).attr('data-is-correct') !== 'true');
     const toBlur = d3.shuffle(incorrectSelected).slice(0, 2);
     toBlur.forEach(card => {
       d3.select(card).classed('blurred', true);
     });
+    // Shake and mark incorrect selection briefly
+    selected.forEach(card => {
+      d3.select(card).classed('incorrect', true);
+      setTimeout(() => d3.select(card).classed('incorrect', false), 500);
+    });
     // Show next hint if available
     if (hintIndex < hints.length) {
-      hintContainer.text(hints[hintIndex]).style('display', 'block');
+      hintContainer
+        .text(hints[hintIndex])
+        .style('display', 'block')
+        .classed('hidden', false)
+        .classed('visible', true)
+        .style('opacity', 1);
       hintIndex++;
     }
     // Deselect all remaining selected cards
@@ -114,19 +196,19 @@ function checkMatch() {
     selected = []; // Clear the array
     if (strikes >= 5) {
       // Final reveal: visually mark the correct self-portraits on the board
-      const correctCards = d3.selectAll('.card').filter(function() {
-        return d3.select(this).attr('data-is-self') === 'TRUE';
-      });
-      correctCards.each(function() {
-        d3.select(this).classed('correct', true).classed('blurred', false);
-      });
-      // Also ensure other cards are blurred to emphasize correct answers
-      d3.selectAll('.card').filter(function() {
-        return d3.select(this).attr('data-is-self') !== 'TRUE';
-      }).classed('blurred', true);
+    const correctCards = d3.selectAll('.card').filter(function() {
+      return d3.select(this).attr('data-is-correct') === 'true';
+    });
+    correctCards.each(function() {
+      d3.select(this).classed('correct', true).classed('blurred', false);
+    });
+    // Also ensure other cards are blurred to emphasize correct answers
+    d3.selectAll('.card').filter(function() {
+      return d3.select(this).attr('data-is-correct') !== 'true';
+    }).classed('blurred', true);
 
-      const revealText = 'Final Reveal<br>Correct 4 portraits<br>Explanation of the connection: These are self-portraits where the artist painted themselves.<br>Additional context for non-connected portraits: These are portraits of other individuals, not the artists themselves.';
-      d3.select('#message').html(revealText).style('display', 'block').style('color', 'red');
+    const revealText = categoriesConfig[currentCategory].revealText;
+    d3.select('#message').html(revealText).style('display', 'block').style('color', 'red');
       gameOver = true;
       showReplayOverlay();
     }
@@ -134,13 +216,13 @@ function checkMatch() {
 }
 
 // Victory reveal animation
-function victoryReveal() {
-  const allCards = d3.selectAll('.card');
-  const nonSelfCards = allCards
-    .filter(function() {
-      return d3.select(this).attr('data-is-self') !== 'TRUE';
-    })
-    .nodes();
+  function victoryReveal() {
+    const allCards = d3.selectAll('.card');
+    const nonSelfCards = allCards
+      .filter(function() {
+        return d3.select(this).attr('data-is-correct') !== 'true';
+      })
+      .nodes();
   
   const shuffledCards = d3.shuffle(nonSelfCards.slice());
   
@@ -184,25 +266,26 @@ function resetGame() {
   gameOver = false;
   hintIndex = 0;
   d3.select('#message').style('display', 'none');
-  hintContainer.text(categoryHint).style('display', 'block');
+  hintContainer.text(categoryHint).classed('hidden', true).style('opacity', 0).style('display', 'block');
   d3.selectAll('.card').classed('blurred', false).classed('correct', false).classed('selected', false).classed('incorrect', false);
   renderGrid();
 }
 
 // Event listener for play again
-playAgainButton.on('click', resetGame);
+playAgainButton.on('click', () => {
+  pickCategory();
+  resetGame();
+});
 
 function startGame() {
-  if (!data.length) {
-    return;
-  }
   d3.select('.game-intro-overlay').classed('hidden', true);
   d3.select('#game-board').classed('visible', true);
   startButton.classed('visible', false).attr('disabled', true);
   overlay.classed('hidden', true);
   gameShell.classed('game-active', true);
   statsContainer.classed('hidden', false);
-  hintContainer.classed('hidden', false);
+  hintContainer.classed('hidden', true).style('opacity', 0).style('display', 'block');
+  pickCategory();
   resetGame();
 }
 

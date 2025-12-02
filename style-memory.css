@@ -148,7 +148,7 @@ header {
   background: transparent;
   border-radius: 0;
   box-shadow: none;
-  align-self: flex-end;
+  align-self: flex-start;
   align-items: flex-start;
 }
 
@@ -172,13 +172,16 @@ header {
   font-size: 0.95rem;
   font-weight: 600;
   color: #0000FF;
-  display: none;
+  display: block;
+  opacity: 0;
   line-height: 1.6;
   background: rgba(0, 0, 255, 0.05);
   border-left: 4px solid #0000FF;
   padding: 0.65rem 0.85rem;
   border-radius: 10px;
+  margin-top: 5.25rem;
   margin-bottom: 0.75rem;
+  transition: opacity 0.35s ease;
 }
 
 #playAgain {
@@ -217,6 +220,15 @@ header {
   transition: transform 0.18s, border-color 0.18s, opacity 0.25s ease;
 }
 
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
 .card:hover {
   transform: none;
 }
@@ -225,16 +237,16 @@ header {
   border-color: #0000FF;
   border-width: 4px;
   border-style: solid;
-  box-shadow: 0 0 0 6px rgba(30,102,255,0.10), 0 8px 16px rgba(0,0,0,0.12);
-  transform: none;
+  box-shadow: 0 6px 16px rgba(0,0,255,0.25), 0 0 0 8px rgba(30,102,255,0.12);
+  transform: translateY(-4px) scale(1.02);
 }
 
 .card.correct {
-  border-color: #1fa823;
+  border-color: #0000FF;
   border-width: 4px;
   border-style: solid;
-  background-color: #e6f7e9;
-  box-shadow: 0 0 0 6px rgba(31,168,35,0.10), 0 8px 16px rgba(0,0,0,0.12);
+  background-color: rgba(0, 0, 255, 0.05);
+  box-shadow: 0 6px 16px rgba(0,0,255,0.25), 0 0 0 8px rgba(30,102,255,0.12);
 }
 
 .card.card-hidden {
@@ -244,10 +256,12 @@ header {
 }
 
 .card.incorrect {
-  border-color: red;
+  border-color: #0000FF;
   border-width: 4px;
   border-style: solid;
-  background-color: lightcoral;
+  background-color: rgba(0, 0, 255, 0.08);
+  box-shadow: 0 0 0 8px rgba(30,102,255,0.12);
+  animation: shake 0.35s ease;
 }
 
 .card.blurred {
@@ -306,5 +320,9 @@ header {
 }
 #stats.hidden,
 #hintMessage.hidden {
-  display: none;
+  opacity: 0;
+}
+
+.visible {
+  opacity: 1 !important;
 }

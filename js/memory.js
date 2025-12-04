@@ -5,6 +5,8 @@ let strikes = 0;
 let gameOver = false;
 let hintIndex = 0;
 
+const normalize = (str = '') => str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
 const categoriesConfig = {
   self: {
     name: "Self-Portraits",
@@ -44,8 +46,32 @@ const categoriesConfig = {
       "Backgrounds often stay sparse. Consider black as sparse here."
     ],
     revealText: 'Final Reveal<br>Correct 4 portraits<br>These are ranked military sitters.'
+  },
+  elite: {
+    name: "Elite daughters/heiresses",
+    isCorrect: (d) => {
+      const targetNames = [
+        'ann elliott morris',
+        'anne hume shippen',
+        'elizabeth depeyster peale',
+        'elizabeth grimke rutledge',
+        'margaret spear smith',
+        'juliana westray wood'
+      ];
+      const fields = [d.title, d.sitter].map(v => normalize(v || ''));
+      return fields.some(f => targetNames.some(name => f.includes(name)));
+    },
+    categoryHint: "Old-money energy. Even on canvas.",
+    hints: [
+      "These women are posture-trained: straight shoulders, soft hands, chin set just enough.",
+      "Jewelry is quiet but strategic: pearls, brooches, gold clasps. Nothing gaudy. Just wealth doing what wealth does.",
+      "Fabrics are a dead giveaway. Silk, satin, embroidery read expensive, even in a two-inch miniature.",
+      "Backgrounds stay controlled. Columns, drapery, tidy interiors are the visual shorthand for “my family owns land.”"
+    ],
+    revealText: 'Final Reveal<br>Correct 4 portraits<br>These are the elite daughters and heiresses.'
   }
 };
+let categoryOrder = [];
 let nextCategoryIndex = 0;
 let currentCategory = 'self';
 let categoryHint = categoriesConfig.self.categoryHint;
@@ -58,9 +84,16 @@ const gameShell = d3.select('#game-shell');
 const statsContainer = d3.select('#stats');
 const hintContainer = d3.select('#hintMessage');
 
+function refreshCategoryOrder() {
+  categoryOrder = d3.shuffle(Object.keys(categoriesConfig));
+  nextCategoryIndex = 0;
+}
+
 function pickCategory() {
-  const keys = Object.keys(categoriesConfig);
-  const cat = keys[nextCategoryIndex % keys.length];
+  if (!categoryOrder.length || nextCategoryIndex >= categoryOrder.length) {
+    refreshCategoryOrder();
+  }
+  const cat = categoryOrder[nextCategoryIndex];
   nextCategoryIndex += 1;
   currentCategory = cat;
   categoryHint = categoriesConfig[cat].categoryHint;
@@ -239,7 +272,7 @@ function checkMatch() {
     selected.forEach(card => {
       d3.select(card).classed('correct', true).classed('selected', false);
     });
-    d3.select('#message').text('You’ve Won!').style('display', 'block').style('color', 'green');
+    d3.select('#message').text('You\'ve Won!').style('display', 'block').style('color', 'green');
     gameOver = true;
     showReplayOverlay();
     triggerConfetti();
@@ -293,6 +326,7 @@ function startGame() {
     .classed('visible', false)
     .style('opacity', 0)
     .style('display', 'block');
+  refreshCategoryOrder();
   pickCategory();
   resetGame();
 }

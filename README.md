@@ -11,6 +11,7 @@ Remember Me? looks at portraits from the American Revolution and asks a basic qu
 ## WIP Drafts
 
 - [In-progress drafts and iterations](https://github.com/derinsavasan/major-studio-1/tree/main/wip-drafts)
+- [Sketches PDF](https://github.com/derinsavasan/major-studio-1/blob/main/sketches/ms1-rev-cross.pdf)
 
 ## Screenshots
 

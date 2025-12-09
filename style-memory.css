@@ -193,10 +193,13 @@ header {
 
 #message {
   font-size: 1.1rem;
-  font-weight: 700;
-  color: #111;
+  font-weight: 400;
+  color: #0000FF;
+  background: transparent;
+  border: none;
   display: none;
-  margin-top: 1rem;
+  margin-top: 4.8rem;
+  margin-bottom: 0.05rem;
   line-height: 1.6;
   text-align: center;
 }
@@ -227,6 +230,7 @@ header {
   display: none;
   justify-content: center;
   width: fit-content;
+  margin-top: -1rem;
 }
 
 #app {

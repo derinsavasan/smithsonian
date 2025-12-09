@@ -4,6 +4,8 @@ let selected = [];
 let strikes = 0;
 let gameOver = false;
 let hintIndex = 0;
+let currentCorrectCards = [];
+let clickedCardIds = new Set();
 
 const normalize = (str = '') => str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -17,8 +19,7 @@ const categoriesConfig = {
       "Look for sitters dressed more plainly than usual. Artists often painted themselves in simple clothes.",
       "Check for faces lit from one side. The light often comes from a studio window or mirror setup.",
       "Not all of these were studio scenes. One sits out in the open."
-    ],
-    revealText: 'Final Reveal<br>Correct 4 portraits<br>These are self-portraits where the artist painted themselves.'
+    ]
   },
   military: {
     name: "Ranked Military",
@@ -26,6 +27,8 @@ const categoriesConfig = {
       const names = [
         'captain charles mcknight',
         'charles mcknight',
+        'capt. john gassoway',
+        'john gassoway',
         'john h. seward',
         'joseph anthony',
         'robert lillibridge',
@@ -44,8 +47,7 @@ const categoriesConfig = {
       "Military sitters rarely soften their posture. The stance is straight, almost drilled.",
       "Weapons aren't required, but swords and scabbards are reliable tells when they appear.",
       "Backgrounds often stay sparse. Consider black as sparse here."
-    ],
-    revealText: 'Final Reveal<br>Correct 4 portraits<br>These are ranked military sitters.'
+    ]
   },
   elite: {
     name: "Elite daughters/heiresses",
@@ -67,8 +69,68 @@ const categoriesConfig = {
       "Jewelry is quiet but strategic: pearls, brooches, gold clasps. Nothing gaudy. Just wealth doing what wealth does.",
       "Fabrics are a dead giveaway. Silk, satin, embroidery read expensive, even in a two-inch miniature.",
       "Backgrounds stay controlled. Columns, drapery, tidy interiors are the visual shorthand for “my family owns land.”"
+    ]
+  },
+  children: {
+    name: "Children",
+    isCorrect: (d) => {
+      const childTitles = [
+        'portrait of a baby boy',
+        'portrait of a boy',
+        'portrait of a child',
+        'the davis children (eliza cheever davis and john derby davis)'
+      ];
+      const fields = [d.title, d.sitter].map(v => normalize(v || ''));
+      return fields.some(f => childTitles.some(title => f.includes(title)));
+    },
+    categoryHint: "Small bodies, big props.",
+    hints: [
+      "The canvas shrinks with the sitter. Smaller subject, smaller portrait.",
+      "The proportions give it away. Heads slightly too large, limbs a little stiff. Cannot sit still.",
+      "The clothes feel miniature but formal: pint-sized gowns, cropped jackets, little lace collars.",
+      "Look for props adults never get, like flowers that say “keep them occupied.”"
+    ]
+  },
+  presidential: {
+    name: "Presidential",
+    names: [
+      'george washington',
+      'john adams',
+      'thomas jefferson',
+      'james madison',
+      'james monroe',
+      'john quincy adams'
     ],
-    revealText: 'Final Reveal<br>Correct 4 portraits<br>These are the elite daughters and heiresses.'
+    isCorrect: (d) => {
+      const fields = [d.title, d.sitter].map(v => normalize(v || ''));
+      return fields.some(f => categoriesConfig.presidential.names.some(name => f.includes(name)));
+    },
+    categoryHint: "The first roster of men who ended up running the country.",
+    hints: [],
+    hintsByPresident: {
+      'george washington': "The only one who looks like a general even when he’s standing still.",
+      'john adams': "Round face, tight lips, and the posture of a man already done with this conversation.",
+      'thomas jefferson': "Long cheekbones, big hair, and the soft-lit calm of a man writing the rules.",
+      'james madison': "Small frame, sharp stare, and a white cravat so bright it steals the scene. He’s standing unlike the rest.",
+      'james monroe': "The confident tilt and swept-back hair of someone who knows the era is his. In a triptych.",
+      'john quincy adams': "The stern jaw and heavy eyelids of a man born into the job."
+    }
+  },
+  unnamed: {
+    name: "Unnamed Sitters",
+    isCorrect: (d) => {
+      const sitter = normalize((d.sitter || '').trim());
+      if (!sitter) return true;
+      const unnamedSignals = ['unknown', 'unidentified', 'unnamed', 'not recorded'];
+      return unnamedSignals.some(sig => sitter.includes(sig));
+    },
+    categoryHint: "Portraits of people who were important enough to paint but not important enough to record.",
+    hints: [
+      "Many are miniatures, small oval pieces meant to be held or kept close, not displayed in grand rooms.",
+      "Clothes stay modest, the kind of everyday garments that give no hint of status or family.",
+      "The settings are generic, usually a flat backdrop or a bit of drapery that tells you nothing about who they were.",
+      "The portraits feel practical, more like a record of a face than a statement, which is why the identity never survived."
+    ]
   }
 };
 let categoryOrder = [];
@@ -83,6 +145,37 @@ const overlay = d3.select('#game-overlay');
 const gameShell = d3.select('#game-shell');
 const statsContainer = d3.select('#stats');
 const hintContainer = d3.select('#hintMessage');
+
+function getCardId(card) {
+  const parts = [card.title, card.sitter, card.artist, card.thumbnail];
+  return parts.map(p => (p || '').trim()).join('|').toLowerCase();
+}
+
+function formatCardLabel(card) {
+  const sitter = (card.sitter || '').trim();
+  const title = (card.title || '').trim();
+  if (sitter) return sitter;
+  if (title) return title;
+  return 'Unknown sitter';
+}
+
+function buildResultMessage(outcome) {
+  const categoryName = categoriesConfig[currentCategory].name;
+  const safeCategory = categoryName.toLowerCase().replace(/\//g, ' ');
+  const displayCategory = safeCategory.replace(/\bportraits?\b$/,'').trim().replace(/[-\s:]+$/,'');
+  const needsPortraitWord = !/\bportrait(s)?\b/.test(displayCategory);
+  const noun = needsPortraitWord ? ' portraits' : '';
+  const labels = currentCorrectCards.map(formatCardLabel);
+  const listText = labels.join(', ');
+  if (outcome === 'win') {
+    return `You’ve guessed all <strong>${displayCategory}${noun}</strong> correctly! Ready for another round?`;
+  }
+  const unseen = currentCorrectCards
+    .filter(c => !clickedCardIds.has(getCardId(c)))
+    .map(formatCardLabel);
+  const unseenText = unseen.length ? ` You never tried: ${unseen.join(', ')}.` : '';
+  return `Missed it — these were ${categoryName}: ${listText}.${unseenText}`;
+}
 
 function refreshCategoryOrder() {
   categoryOrder = d3.shuffle(Object.keys(categoriesConfig));
@@ -126,9 +219,39 @@ function renderGrid() {
     const remainingSelf = correctPool.filter(d => d !== westFamily);
     if (westFamily) selectedCorrect.push(westFamily);
     selectedCorrect.push(...d3.shuffle(remainingSelf.slice()).slice(0, Math.max(0, 4 - selectedCorrect.length)));
+  } else if (currentCategory === 'presidential') {
+    const presidentMap = {};
+    correctPool.forEach(d => {
+      const fields = [d.title, d.sitter].map(v => normalize(v || ''));
+      const matched = categoriesConfig.presidential.names.find(name => fields.some(f => f.includes(name)));
+      if (matched) {
+        if (!presidentMap[matched]) presidentMap[matched] = [];
+        presidentMap[matched].push(d);
+      }
+    });
+    const availablePresidents = Object.keys(presidentMap);
+    const chosenPresidents = d3.shuffle(availablePresidents).slice(0, 4);
+    chosenPresidents.forEach(name => {
+      const candidates = presidentMap[name];
+      if (candidates && candidates.length) {
+        const pick = candidates[Math.floor(Math.random() * candidates.length)];
+        selectedCorrect.push(pick);
+      }
+    });
+    // Order hints to match the selected presidents for this round
+    const hintList = chosenPresidents
+      .map(name => categoriesConfig.presidential.hintsByPresident[name])
+      .filter(Boolean);
+    hints = hintList;
   } else {
     selectedCorrect = d3.shuffle(correctPool.slice()).slice(0, 4);
   }
+  // Hard cap correct selections to 4 across all categories
+  if (selectedCorrect.length > 4) {
+    selectedCorrect = selectedCorrect.slice(0, 4);
+  }
+  currentCorrectCards = selectedCorrect.slice();
+  clickedCardIds.clear();
 
   // Fill remaining with incorrect
   const incorrectPool = pool.filter(d => !config.isCorrect(d) && !selectedCorrect.includes(d));
@@ -168,6 +291,8 @@ function handleSelect() {
   if (gameOver) return;
 
   const card = d3.select(this);
+  const datum = card.datum();
+  clickedCardIds.add(getCardId(datum));
   if (card.classed('blurred')) return; // Can't select blurred cards
 
   const index = selected.indexOf(this);
@@ -239,8 +364,8 @@ function checkMatch() {
       return d3.select(this).attr('data-is-correct') !== 'true';
     }).classed('blurred', true);
 
-    const revealText = categoriesConfig[currentCategory].revealText;
-    d3.select('#message').html(revealText).style('display', 'block').style('color', 'red');
+    const revealText = buildResultMessage('lose');
+    d3.select('#message').html(revealText).style('display', 'block').style('color', '#0000FF').style('background', 'transparent');
       gameOver = true;
       showReplayOverlay();
     }
@@ -272,7 +397,7 @@ function checkMatch() {
     selected.forEach(card => {
       d3.select(card).classed('correct', true).classed('selected', false);
     });
-    d3.select('#message').text('You\'ve Won!').style('display', 'block').style('color', 'green');
+    d3.select('#message').html(buildResultMessage('win')).style('display', 'block').style('color', '#111').style('background', 'transparent');
     gameOver = true;
     showReplayOverlay();
     triggerConfetti();
@@ -297,6 +422,7 @@ function resetGame() {
   selected = [];
   gameOver = false;
   hintIndex = 0;
+  clickedCardIds.clear();
   d3.select('#message').style('display', 'none');
   hintContainer
     .text(categoryHint)

@@ -5,6 +5,127 @@
   box-sizing: border-box;
 }
 
+/* Honorable Mentions */
+#honorable-mentions {
+  padding: 3rem 1.5rem 4rem;
+  margin-top: 1.5rem;
+  background: white;
+}
+
+.honorable-header {
+  text-align: center;
+  margin-bottom: 2.2rem;
+}
+
+.honorable-subtitle {
+  font-size: 1.18rem;
+  line-height: 1.7;
+  color: #000;
+  margin: 0;
+  font-weight: 400;
+}
+
+.honorable-carousel {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hm-frame {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 1.4rem;
+  box-shadow: none;
+}
+
+.hm-slide {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.hm-image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.hm-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.hm-title {
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin: 0;
+  color: #fff;
+  background: #0000FF;
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.hm-text {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #222;
+  line-height: 1.6;
+}
+
+.hm-nav {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hm-nav:hover {
+  background: #0000FF;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .honorable-carousel {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-nav {
+    width: 100%;
+  }
+  
+  .hm-frame {
+    order: 1;
+  }
+  
+  .hm-slide {
+    grid-template-columns: 1fr;
+  }
+  
+  .hm-copy {
+    text-align: left;
+  }
+}
+
 body {
   font-family: 'Cabin', Arial, sans-serif;
   background: white;
@@ -360,6 +481,10 @@ body {
   margin-top: -30vh;
   position: relative;
   z-index: 5;
+}
+
+.transition-arrow-post-game {
+  margin-top: 2rem;
 }
 
 /* Post-chart explanatory text */

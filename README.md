@@ -20,7 +20,6 @@ Remember Me? looks at portraits from the American Revolution and asks a basic qu
 ![Timeline](3-timeline.png)
 ![Filters](4-filter.png)
 ![Tooltip](4-tooltip.png)
-![Cards](5-cards.png)
 ![Game](5-game.png)
 ![Game Win](6-game-win.png)
 ![Game Hint](7-game-hint.png)

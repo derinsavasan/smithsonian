@@ -39,6 +39,7 @@ header {
 
 #game-shell {
   flex: 0 1 auto;
+  position: relative;
 }
 
 #game-shell.game-active {
@@ -144,7 +145,7 @@ header {
   border-radius: 0;
   box-shadow: none;
   align-self: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 #message {
@@ -161,13 +162,13 @@ header {
 }
 
 #hintMessage {
-  position: absolute;
-  top: -265px;
-  left: 0;
-  right: 0;
+  position: sticky;
+  top: 1.5rem;
+  left: auto;
+  right: auto;
   width: 100%;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 400;
   color: #0000FF;
   display: block;
   opacity: 0;
@@ -180,14 +181,18 @@ header {
   text-align: left;
   box-sizing: border-box;
   z-index: 10;
+  margin-bottom: 0.4rem;
 }
 
 .selection-count {
-  align-self: flex-start;
   font-size: 0.95rem;
-  font-weight: 600;
-  color: #0000FF;
-  margin-top: 0.3rem;
+  font-weight: 400;
+  color: #111;
+  text-align: left;
+  position: absolute;
+  bottom: -1.8rem;
+  right: -0.04rem;
+  pointer-events: none;
 }
 
 #playAgain {

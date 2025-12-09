@@ -6,6 +6,7 @@ let gameOver = false;
 let hintIndex = 0;
 let currentCorrectCards = [];
 let clickedCardIds = new Set();
+let selectionVisible = false;
 
 const normalize = (str = '') => str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -143,8 +144,8 @@ const startButton = d3.select('#startGame');
 const playAgainButton = d3.select('#playAgain');
 const overlay = d3.select('#game-overlay');
 const gameShell = d3.select('#game-shell');
-const statsContainer = d3.select('#stats');
 const hintContainer = d3.select('#hintMessage');
+const selectionCount = d3.select('#selectionCount');
 
 function getCardId(card) {
   const parts = [card.title, card.sitter, card.artist, card.thumbnail];
@@ -152,29 +153,62 @@ function getCardId(card) {
 }
 
 function formatCardLabel(card) {
-  const sitter = (card.sitter || '').trim();
-  const title = (card.title || '').trim();
+  const clean = (value) => (value || '')
+    .trim()
+    .replace(/\s*\(.*?\)\s*/g, ' ') // drop parenthetical info
+    .replace(/\s{2,}/g, ' ')        // collapse double spaces
+    .trim();
+  const sitter = clean(card.sitter);
+  const title = clean(card.title);
   if (sitter) return sitter;
   if (title) return title;
   return 'Unknown sitter';
 }
 
+function formatList(values) {
+  if (!values.length) return '';
+  if (values.length === 1) return `<strong>${values[0]}</strong>`;
+  if (values.length === 2) return `<strong>${values[0]}</strong> and <strong>${values[1]}</strong>`;
+  const allButLast = values.slice(0, -1).map(v => `<strong>${v}</strong>`).join(', ');
+  const last = `<strong>${values[values.length - 1]}</strong>`;
+  return `${allButLast}, and ${last}`;
+}
+
 function buildResultMessage(outcome) {
   const categoryName = categoriesConfig[currentCategory].name;
   const safeCategory = categoryName.toLowerCase().replace(/\//g, ' ');
-  const displayCategory = safeCategory.replace(/\bportraits?\b$/,'').trim().replace(/[-\s:]+$/,'');
-  const needsPortraitWord = !/\bportrait(s)?\b/.test(displayCategory);
-  const noun = needsPortraitWord ? ' portraits' : '';
+  let displayCategory = safeCategory.replace(/\bportraits?\b$/,'').trim().replace(/[-\s:]+$/,'');
+  if (currentCategory === 'elite') {
+    displayCategory = 'elite daughter';
+  }
   const labels = currentCorrectCards.map(formatCardLabel);
   const listText = labels.join(', ');
   if (outcome === 'win') {
-    return `You’ve guessed all <strong>${displayCategory}${noun}</strong> correctly! Ready for another round?`;
+    return `You’ve guessed all <strong>${displayCategory}</strong> <strong>portraits</strong> correctly! Ready for another round?`;
   }
-  const unseen = currentCorrectCards
-    .filter(c => !clickedCardIds.has(getCardId(c)))
-    .map(formatCardLabel);
-  const unseenText = unseen.length ? ` You never tried: ${unseen.join(', ')}.` : '';
-  return `Missed it — these were ${categoryName}: ${listText}.${unseenText}`;
+  const clickedCorrect = currentCorrectCards.filter(c => clickedCardIds.has(getCardId(c)));
+  const missedCorrect = currentCorrectCards.filter(c => !clickedCardIds.has(getCardId(c)));
+  const clickedLabels = clickedCorrect.map(formatCardLabel);
+  const missedLabels = missedCorrect.map(formatCardLabel);
+  const clickedText = formatList(clickedLabels);
+  const missedText = formatList(missedLabels);
+  if (!clickedCorrect.length) {
+    return `The category was <strong>${displayCategory}</strong> <strong>portraits</strong>.`;
+  }
+  if (missedCorrect.length) {
+    return `You missed ${missedText}, but you did tap ${clickedText}. Try combining them next time.`;
+  }
+  return `You tapped on all four <strong>${displayCategory}</strong> <strong>portraits</strong> at some point, just never at the same time. Another round?`;
+}
+
+function updateSelectionCount() {
+  if (!selectionVisible) {
+    selectionCount.style('display', 'none').text('');
+    return;
+  }
+  selectionCount
+    .style('display', 'block')
+    .html(`Selected: <strong>${selected.length}/4</strong>`);
 }
 
 function refreshCategoryOrder() {
@@ -308,10 +342,12 @@ function handleSelect() {
       card.classed('selected', true);
     }
   }
+  selectionVisible = true;
 
   if (selected.length === 4) {
     setTimeout(checkMatch, 500);
   }
+  updateSelectionCount();
 }
 
 // Check if selected are all self-portraits
@@ -351,6 +387,8 @@ function checkMatch() {
       d3.select(card).classed('selected', false);
     });
     selected = []; // Clear the array
+    selectionVisible = true;
+    updateSelectionCount();
     if (strikes >= 5) {
       // Final reveal: visually mark the correct self-portraits on the board
     const correctCards = d3.selectAll('.card').filter(function() {
@@ -365,7 +403,8 @@ function checkMatch() {
     }).classed('blurred', true);
 
     const revealText = buildResultMessage('lose');
-    d3.select('#message').html(revealText).style('display', 'block').style('color', '#0000FF').style('background', 'transparent');
+    d3.select('#message').html(revealText).style('display', 'block').style('color', '#111').style('background', 'transparent');
+    selectionCount.style('display', 'none');
       gameOver = true;
       showReplayOverlay();
     }
@@ -398,6 +437,7 @@ function checkMatch() {
       d3.select(card).classed('correct', true).classed('selected', false);
     });
     d3.select('#message').html(buildResultMessage('win')).style('display', 'block').style('color', '#111').style('background', 'transparent');
+    selectionCount.style('display', 'none');
     gameOver = true;
     showReplayOverlay();
     triggerConfetti();
@@ -423,6 +463,7 @@ function resetGame() {
   gameOver = false;
   hintIndex = 0;
   clickedCardIds.clear();
+  selectionVisible = false;
   d3.select('#message').style('display', 'none');
   hintContainer
     .text(categoryHint)
@@ -432,6 +473,8 @@ function resetGame() {
     .style('display', 'block');
   d3.selectAll('.card').classed('blurred', false).classed('correct', false).classed('selected', false).classed('incorrect', false);
   renderGrid();
+  updateSelectionCount();
+  selectionCount.style('display', 'none');
 }
 
 // Event listener for play again
@@ -446,7 +489,6 @@ function startGame() {
   startButton.classed('visible', false).attr('disabled', true);
   overlay.classed('hidden', true);
   gameShell.classed('game-active', true);
-  statsContainer.classed('hidden', false);
   hintContainer
     .classed('hidden', true)
     .classed('visible', false)

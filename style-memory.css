@@ -78,42 +78,6 @@ header {
   display: none;
 }
 
-.game-result-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.96);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 1.5rem;
-  padding: 0;
-  box-sizing: border-box;
-  z-index: 50;
-}
-
-.game-result-overlay.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  display: none;
-}
-
-#resultMessage {
-  font-size: 1.3rem;
-  font-weight: 700;
-  text-align: center;
-  line-height: 1.6;
-  max-width: 500px;
-}
-
-.overlay-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
 .game-button,
 #playAgain {
   font-family: 'Cabin', Arial, sans-serif;
@@ -183,14 +147,6 @@ header {
   align-items: center;
 }
 
-#stats {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #111;
-  white-space: nowrap;
-  overflow: visible;
-}
-
 #message {
   font-size: 1.1rem;
   font-weight: 400;
@@ -224,6 +180,14 @@ header {
   text-align: left;
   box-sizing: border-box;
   z-index: 10;
+}
+
+.selection-count {
+  align-self: flex-start;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0000FF;
+  margin-top: 0.3rem;
 }
 
 #playAgain {

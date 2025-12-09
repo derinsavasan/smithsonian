@@ -1,6 +1,6 @@
 # Remember Me?
 
-Remember Me? looks at portraits from the American Revolution and asks a basic question: who actually made it into the frame? I scraped data from the National Portrait Gallery and built a set of interactives (filters, connection game) that let you see the gaps for yourself. Men everywhere. Women barely visible. A handful of artists shaping what the “founders” even look like. It’s history told through portraits, but the absences say more than the faces. This isn’t about patriotism. It’s about who gets remembered, and who gets edited out.
+[Remember Me?](https://derinsavasan.github.io/smithsonian/) looks at portraits from the American Revolution and asks a basic question: who actually made it into the frame? I scraped data from the National Portrait Gallery and built a set of interactives (filters, connection game) that let you see the gaps for yourself. Men everywhere. Women barely visible. A handful of artists shaping what the “founders” even look like. It’s history told through portraits, but the absences say more than the faces. This isn’t about patriotism. It’s about who gets remembered, and who gets edited out.
 
 ## Sources
 

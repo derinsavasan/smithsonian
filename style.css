@@ -126,6 +126,41 @@
   }
 }
 
+#about-project {
+  background: white;
+  padding: 3.5rem 1.5rem 4.5rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.about-container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.about-container h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  font-family: 'Boldonse', Arial, sans-serif;
+}
+
+.about-container p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #111;
+}
+
+.about-container a {
+  color: #0000FF;
+  text-decoration: underline;
+  font-weight: 400;
+}
+
+.about-container a:hover {
+  text-decoration: none;
+}
+
 body {
   font-family: 'Cabin', Arial, sans-serif;
   background: white;
@@ -485,6 +520,11 @@ body {
 
 .transition-arrow-post-game {
   margin-top: 2rem;
+}
+
+.transition-arrow-post-about {
+  margin-top: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 /* Post-chart explanatory text */

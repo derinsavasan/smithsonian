@@ -118,7 +118,7 @@ const categoriesConfig = {
     }
   },
   unnamed: {
-    name: "Unnamed Sitters",
+    name: "Unnamed Sitter",
     isCorrect: (d) => {
       const sitter = normalize((d.sitter || '').trim());
       if (!sitter) return true;
